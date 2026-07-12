@@ -375,6 +375,7 @@ def _check_python_dependencies(doctor: Doctor) -> None:
         "allure-pytest": "allure_pytest",
         "yaml": "yaml",
         "requests": "requests",
+        "pypdf": "pypdf",
     }
     for label, module_name in imports.items():
         if importlib.util.find_spec(module_name):

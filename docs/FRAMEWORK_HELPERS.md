@@ -41,6 +41,8 @@ docs/helpers_catalog.html
 | `ApiClient` | API | api, setup, cleanup | Lightweight API client for setup, cleanup, and hybrid UI/API tests. |
 | `assert_status_code` | API | api, assertion | Asserts API response status code. |
 | `assert_json_field` | API | api, json, assertion | Asserts nested JSON response fields. |
+| `DatabaseClient`, `assert_record_exists` | Database | db, setup, cleanup | Runs DB-API setup/cleanup queries and validates records. |
+| `assert_row_count`, `assert_table_exists` | Database | db, assertion | Validates database row counts and table existence. |
 | `today`, `tomorrow`, `yesterday` | Date/Time | date, timezone | Returns relative dates, optionally timezone-aware. |
 | `add_days`, `format_date`, `parse_date` | Date/Time | date, formatting | Date arithmetic, formatting, and parsing helpers. |
 | `build_url` | URL | query, navigation | Builds a URL with path and query parameters. |
@@ -61,6 +63,8 @@ docs/helpers_catalog.html
 | `wait_for_download`, `save_download` | File Transfer | download, export | Waits for Playwright downloads and saves them to a controlled directory. |
 | `assert_download_filename`, `assert_download_extension` | File Transfer | download, assertion | Validates downloaded filenames and extensions. |
 | `create_upload_file`, `set_input_files` | File Transfer | upload, file input | Creates upload fixtures and sets files on page or locator inputs. |
+| `get_pdf_page_count`, `read_pdf_text` | PDF | pdf, document, download | Reads PDF page count, text, and metadata. |
+| `assert_pdf_page_count`, `assert_pdf_contains_text` | PDF | pdf, assertion | Validates downloaded or generated PDF documents. |
 | `step`, `attach_json`, `attach_text`, `attach_file` | Allure Debug | allure, attachment, reporting | Adds reusable Allure steps and attachments. |
 | `attach_page_url`, `attach_html_snapshot` | Allure Debug | page, html, debug | Attaches current page URL and HTML snapshot for debugging. |
 | `start_console_tracking`, `assert_no_console_errors` | Console | console, pageerror, debug | Tracks browser console warnings/errors and page errors. |
@@ -74,6 +78,12 @@ docs/helpers_catalog.html
 | `wait_for_notification`, `assert_notification_visible` | Notifications | toast, snackbar, alert | Waits for and validates toast, alert, snackbar, or notification UI. |
 | `assert_notification_hidden`, `dismiss_notification` | Notifications | dismiss, hidden, toast | Dismisses notifications and validates they disappear. |
 | `SoftAssert`, `soft_assert` | Assertions | soft assertion, grouped failures | Collects assertion failures and reports them together at the end. |
+| `assert_security_headers`, `assert_cookie_security_flags` | Security | security, headers, cookies | Runs lightweight browser security smoke checks. |
+| `assert_no_sensitive_values_in_storage` | Security | secrets, storage, smoke | Detects common secret-like values in browser storage. |
+| `assert_page_load_under`, `assert_no_slow_resources` | Performance | performance, timing, resources | Validates page timing and slow resource thresholds. |
+| `get_resource_summary`, `assert_resource_count_under` | Performance | performance, assets | Summarizes and validates browser resource counts. |
+| `assert_page_locale`, `assert_page_direction` | i18n | locale, rtl, ltr | Validates page locale and text direction. |
+| `assert_no_untranslated_keys`, `switch_language` | i18n | translation, language | Detects leaked translation keys and switches language controls. |
 | `get_cookie`, `set_cookie`, `delete_cookie` | Cookies | cookie, session | Reads, creates, and deletes browser cookies. |
 | `assert_cookie_exists`, `assert_cookie_value` | Cookies | cookie, assertion | Validates cookie existence, value, and attributes. |
 | `copy_cookies` | Cookies | session, reuse | Copies cookies between Playwright contexts or pages. |
@@ -293,6 +303,31 @@ file_input = page.locator("[data-test='document-upload']")
 set_input_files(file_input, upload_path)
 ```
 
+## PDF Helpers
+
+Use PDF helpers for downloaded invoices, statements, reports, labels, or generated documents.
+
+```python
+from utils.helpers.pdf import (
+    assert_pdf_contains_text,
+    assert_pdf_metadata_contains,
+    assert_pdf_page_count,
+)
+
+
+download_path = wait_for_download(
+    page,
+    lambda: page.get_by_role("button", name="Download invoice").click(),
+    downloads_dir="downloads",
+)
+
+assert_pdf_page_count(download_path, 2)
+assert_pdf_contains_text(download_path, "Invoice")
+assert_pdf_metadata_contains(download_path, "Title", "Invoice")
+```
+
+PDF text extraction depends on how the PDF was generated. Scanned image PDFs need OCR, which is intentionally out of scope for this lightweight helper.
+
 ## Browser Storage Helpers
 
 Use these helpers to save and reuse authenticated sessions, manage local storage, or clean browser state.
@@ -403,6 +438,32 @@ assert_status_code(response, 200)
 assert_json_field(response, "user.name", "Alex")
 ```
 
+## Database Helpers
+
+Use database helpers for DB-backed setup, cleanup, and assertions. They work with Python DB-API style connections; SQLite is supported out of the box by Python.
+
+```python
+import sqlite3
+
+from utils.helpers.database import (
+    DatabaseClient,
+    assert_record_exists,
+    assert_row_count,
+    assert_table_exists,
+)
+
+
+client = DatabaseClient(sqlite3.connect(":memory:"))
+client.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT)")
+client.execute("INSERT INTO users (email) VALUES (?)", ("qa@example.com",))
+
+assert_table_exists(client, "users")
+assert_record_exists(client, "SELECT * FROM users WHERE email = ?", ("qa@example.com",))
+assert_row_count(client, "SELECT COUNT(*) FROM users", 1)
+```
+
+Use the cleanup registry with DB helpers when tests create data that must be removed after the scenario.
+
 ## Network Helpers
 
 Use network helpers when the UI flow must wait for a backend response, validate browser-side API behavior, monitor failed requests, or stub expensive resources.
@@ -451,6 +512,51 @@ mock_response(
     body='{"checkoutV2": true}',
 )
 ```
+
+## Security Smoke Helpers
+
+Use security helpers for lightweight smoke checks. They do not replace a penetration test or full security scanner, but they catch common regressions in headers, cookies, and browser storage.
+
+```python
+from utils.helpers.security import (
+    assert_cookie_security_flags,
+    assert_no_sensitive_values_in_storage,
+    assert_security_headers,
+)
+
+
+response = page.goto(base_url)
+assert_security_headers(response)
+
+cookies = page.context.cookies()
+assert_cookie_security_flags(cookies, ["session"])
+
+assert_no_sensitive_values_in_storage(page)
+```
+
+Tune required headers per application. Some demo sites may not expose all production-grade security headers.
+
+## Performance Smoke Helpers
+
+Use performance helpers for fast budget checks around navigation timing and browser resources.
+
+```python
+from utils.helpers.performance import (
+    assert_no_slow_resources,
+    assert_page_load_under,
+    get_resource_summary,
+)
+
+
+page.goto(base_url)
+assert_page_load_under(page, 3000)
+assert_no_slow_resources(page, 1500, ignored_url_patterns=["*analytics*"])
+
+summary = get_resource_summary(page)
+assert summary["count"] < 100
+```
+
+Keep thresholds realistic per environment. CI runners can be slower than local machines.
 
 ## Allure Debug Helpers
 
@@ -684,6 +790,28 @@ assert_minimum_heading_count(page, 1)
 assert_images_have_alt_text(page)
 assert_element_accessible_name(page, "button", "Add to cart")
 ```
+
+## i18n Helpers
+
+Use i18n helpers for multilingual sites, RTL/LTR checks, language switching, and leaked translation-key detection.
+
+```python
+from utils.helpers.i18n import (
+    assert_locale_direction,
+    assert_no_untranslated_keys,
+    assert_page_locale,
+    switch_language,
+)
+
+
+assert_page_locale(page, "en-US")
+assert_no_untranslated_keys(page)
+
+switch_language(page, "[data-test='language']", "ar-JO")
+assert_locale_direction(page, "ar-JO")
+```
+
+For RTL languages such as Arabic, Hebrew, Persian, and Urdu, `assert_locale_direction` expects `dir="rtl"` or computed RTL direction.
 
 ## Visual Helpers
 

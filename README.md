@@ -1,5 +1,12 @@
 # Web Automation Framework User Guide
 
+[![Python Playwright Tests](https://github.com/iisleem/web-automation-framework/actions/workflows/playwright-tests.yml/badge.svg)](https://github.com/iisleem/web-automation-framework/actions/workflows/playwright-tests.yml)
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/)
+[![Playwright](https://img.shields.io/badge/playwright-python-2EAD33.svg)](https://playwright.dev/python/)
+[![Pytest](https://img.shields.io/badge/tested%20with-pytest-0A9EDC.svg)](https://pytest.org/)
+[![Allure](https://img.shields.io/badge/reports-Allure-orange.svg)](https://allurereport.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Python web automation framework built with Playwright, Pytest, pytest-playwright, Page Object Model, Allure reporting, retry support, parallel execution, and GitHub Actions CI.
 
 The included demo application is [SauceDemo](https://www.saucedemo.com/).
@@ -679,9 +686,14 @@ Current helper categories:
 - Auth/session helpers for saving and reusing logged-in Playwright storage state
 - Cookie helpers for session assertions, feature flags, and context reuse
 - API helpers for setup, cleanup, and hybrid UI/API tests
+- Database helpers for setup, cleanup, and DB-backed assertions
 - Network helpers for responses, failed requests, mocks, and blocked resources
+- Security smoke helpers for headers, cookies, storage, and secret-leak checks
+- Performance smoke helpers for navigation timing and resource thresholds
 - Date/time helpers
 - URL/query parameter helpers
+- PDF helpers for downloaded document validation
+- i18n helpers for locale, direction, translation-key, and language-switch checks
 - Environment/secrets helpers
 - Table/grid helpers
 - Allure/debug helpers for reusable steps and attachments
@@ -935,6 +947,15 @@ python scripts/generate_allure_report.py
 ```
 
 If official Allure cannot run, the framework automatically falls back to the built-in HTML report.
+
+If you need parallel execution, prefer the supported commands:
+
+```bash
+pytest -n 4
+python framework.py run --browsers chromium firefox webkit --browser-workers 3
+```
+
+Avoid starting multiple independent `pytest` commands at the same time against the same `reports/allure-results` directory. Each pytest session cleans that directory before writing Allure results, so separate concurrent sessions can race with each other.
 
 If a test fails, inspect:
 
