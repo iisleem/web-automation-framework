@@ -1,0 +1,13 @@
+{
+  "valid_customer": {
+    "first_name": "Alex",
+    "last_name": "Morgan",
+    "postal_code": "10001"
+  },
+  "missing_first_name": {
+    "first_name": "",
+    "last_name": "Morgan",
+    "postal_code": "10001",
+    "expected_error": "Error: First Name is required"
+  }
+}

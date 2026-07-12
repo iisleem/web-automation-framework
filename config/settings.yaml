@@ -1,0 +1,42 @@
+timeouts:
+  default_timeout_ms: 10000
+  navigation_timeout_ms: 30000
+
+browser:
+  viewport:
+    width: 1440
+    height: 900
+  ignore_https_errors: true
+  record_video_size:
+    width: 1280
+    height: 720
+
+execution:
+  browsers:
+    - chromium
+    - firefox
+    - webkit
+  browser_workers: 1
+
+artifacts:
+  screenshots_dir: screenshots
+  videos_dir: videos
+  traces_dir: traces
+  allure_results_dir: reports/allure-results
+
+retries:
+  default: 1
+
+self_healing:
+  enabled: true
+  timeout_ms: 1500
+
+email:
+  provider: imap
+  host: imap.gmail.com
+  port: 993
+  use_ssl: true
+  username_env: TEST_EMAIL_USERNAME
+  password_env: TEST_EMAIL_PASSWORD
+  mailbox: INBOX
+  default_otp_regex: "\\b\\d{4,8}\\b"

@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Framework Helpers Catalog</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 32px; color: #172033; }
+    h1 { margin-bottom: 8px; }
+    input { width: 100%; max-width: 720px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 18px 0; font-size: 16px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border-bottom: 1px solid #e5e7eb; padding: 11px; text-align: left; vertical-align: top; }
+    th { background: #f1f5f9; }
+    code { background: #eef2f6; padding: 2px 5px; border-radius: 4px; }
+    .tag { display: inline-block; margin: 2px; padding: 2px 6px; border-radius: 999px; background: #dbeafe; color: #1e3a8a; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Framework Helpers Catalog</h1>
+  <p>Search by helper name, category, tag, or description.</p>
+  <input id="search" type="search" placeholder="Search helpers...">
+  <table>
+    <thead>
+      <tr>
+        <th>Helper</th>
+        <th>Category</th>
+        <th>Tags</th>
+        <th>Description</th>
+        <th>Docs</th>
+      </tr>
+    </thead>
+    <tbody id="helpers">
+      <tr data-search="email otp imap verification get latest sender subject">
+        <td><code>EmailOtpHelper.get_latest_otp</code></td>
+        <td>Email</td>
+        <td><span class="tag">otp</span><span class="tag">imap</span><span class="tag">email</span></td>
+        <td>Reads the latest OTP from an email matching sender and/or subject filters.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="email otp wait polling verification sender subject">
+        <td><code>EmailOtpHelper.wait_for_otp</code></td>
+        <td>Email</td>
+        <td><span class="tag">otp</span><span class="tag">wait</span><span class="tag">polling</span></td>
+        <td>Polls email until an OTP arrives or timeout is reached.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="imap email inbox latest sender subject">
+        <td><code>ImapEmailClient.find_latest_email</code></td>
+        <td>Email</td>
+        <td><span class="tag">imap</span><span class="tag">inbox</span></td>
+        <td>Reads the latest email by sender and/or subject.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="wait until polling retry timeout condition">
+        <td><code>wait_until</code></td>
+        <td>Wait</td>
+        <td><span class="tag">polling</span><span class="tag">retry</span></td>
+        <td>Repeats a condition until it returns a truthy value or times out.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="text otp regex parsing extract">
+        <td><code>extract_otp</code></td>
+        <td>Text</td>
+        <td><span class="tag">otp</span><span class="tag">regex</span></td>
+        <td>Extracts the first OTP-like value from text.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="text regex parsing first match capture group">
+        <td><code>extract_first_match</code></td>
+        <td>Text</td>
+        <td><span class="tag">regex</span><span class="tag">parsing</span></td>
+        <td>Extracts the first regex match or first capture group.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="text numbers parsing digits extract">
+        <td><code>extract_numbers</code></td>
+        <td>Text</td>
+        <td><span class="tag">numbers</span><span class="tag">parsing</span></td>
+        <td>Returns all numeric groups from text.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="text normalize whitespace cleanup string">
+        <td><code>normalize_text</code></td>
+        <td>Text</td>
+        <td><span class="tag">cleanup</span><span class="tag">string</span></td>
+        <td>Collapses repeated whitespace for stable text comparisons.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="data random email unique generator test data">
+        <td><code>random_email</code></td>
+        <td>Data</td>
+        <td><span class="tag">test data</span><span class="tag">email</span></td>
+        <td>Generates unique email addresses for test data.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="data random username unique generator test data">
+        <td><code>random_username</code></td>
+        <td>Data</td>
+        <td><span class="tag">test data</span><span class="tag">username</span></td>
+        <td>Generates random usernames.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="files download wait file extension cleanup">
+        <td><code>wait_for_file</code></td>
+        <td>Files</td>
+        <td><span class="tag">download</span><span class="tag">files</span></td>
+        <td>Waits for a file matching a glob pattern.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="file transfer download export wait save filename extension content">
+        <td><code>wait_for_download / save_download</code></td>
+        <td>File Transfer</td>
+        <td><span class="tag">download</span><span class="tag">export</span></td>
+        <td>Waits for Playwright downloads and saves them to a controlled directory.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="file transfer upload input file create fixture set input files">
+        <td><code>create_upload_file / set_input_files</code></td>
+        <td>File Transfer</td>
+        <td><span class="tag">upload</span><span class="tag">file input</span></td>
+        <td>Creates upload files and sets them on Playwright page or locator file inputs.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="browser storage session cookies local storage save clear">
+        <td><code>save_storage_state</code></td>
+        <td>Browser</td>
+        <td><span class="tag">session</span><span class="tag">storage</span></td>
+        <td>Saves Playwright browser storage state for session reuse.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="auth session login storage state authenticated reuse context cookies origin">
+        <td><code>create_authenticated_state / new_context_with_storage</code></td>
+        <td>Auth</td>
+        <td><span class="tag">auth</span><span class="tag">session</span></td>
+        <td>Creates, validates, clears, and reuses authenticated Playwright storage state.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="cookies session cookie get set delete assert value attribute copy">
+        <td><code>get_cookie / set_cookie / delete_cookie</code></td>
+        <td>Cookies</td>
+        <td><span class="tag">cookies</span><span class="tag">session</span></td>
+        <td>Reads, writes, deletes, copies, and validates browser cookies.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="api client get post put delete setup cleanup">
+        <td><code>ApiClient</code></td>
+        <td>API</td>
+        <td><span class="tag">api</span><span class="tag">setup</span></td>
+        <td>Lightweight API client for setup, cleanup, and hybrid UI/API tests.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="api assertion status code json field">
+        <td><code>assert_status_code / assert_json_field</code></td>
+        <td>API</td>
+        <td><span class="tag">api</span><span class="tag">assertions</span></td>
+        <td>Reusable assertions for API response status and JSON fields.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="network response wait api status method url json field">
+        <td><code>wait_for_response / assert_response_status</code></td>
+        <td>Network</td>
+        <td><span class="tag">network</span><span class="tag">response</span></td>
+        <td>Waits for matching browser network responses and validates response status/data.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="network requestfailed failed requests tracker monitor no failures">
+        <td><code>start_failed_request_tracking</code></td>
+        <td>Network</td>
+        <td><span class="tag">requestfailed</span><span class="tag">monitoring</span></td>
+        <td>Tracks failed browser requests and asserts there were no unexpected failures.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="network route mock response block resources image font media performance">
+        <td><code>mock_response / block_resources</code></td>
+        <td>Network</td>
+        <td><span class="tag">route</span><span class="tag">mock</span></td>
+        <td>Mocks network responses or blocks resource types such as images and fonts.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="allure debug reporting step attach json text file html url snapshot">
+        <td><code>step / attach_json / attach_file</code></td>
+        <td>Allure Debug</td>
+        <td><span class="tag">allure</span><span class="tag">attachments</span></td>
+        <td>Adds reusable Allure steps and debug attachments.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="console errors warnings pageerror browser debug tracker">
+        <td><code>start_console_tracking</code></td>
+        <td>Console</td>
+        <td><span class="tag">console</span><span class="tag">debug</span></td>
+        <td>Tracks console warnings/errors and page errors during UI tests.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="forms fill form input checkbox select file validation clear assert">
+        <td><code>fill_form / FormField</code></td>
+        <td>Forms</td>
+        <td><span class="tag">forms</span><span class="tag">input</span></td>
+        <td>Fills form fields from maps or explicit field definitions.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="forms validation message assert field value checkbox checked submit wait url">
+        <td><code>assert_validation_message / submit_and_wait_for_url</code></td>
+        <td>Forms</td>
+        <td><span class="tag">validation</span><span class="tag">assertions</span></td>
+        <td>Validates field values, checkbox state, messages, and submit navigation.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="keyboard focus tab order active element accessibility press key shift tab assertion">
+        <td><code>press_key / assert_focus_order</code></td>
+        <td>Keyboard</td>
+        <td><span class="tag">keyboard</span><span class="tag">focus</span></td>
+        <td>Sends keyboard actions and validates focused elements or tab order.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="cleanup registry teardown test data api cleanup resource delete reverse order">
+        <td><code>CleanupRegistry / assert_cleanup_success</code></td>
+        <td>Cleanup</td>
+        <td><span class="tag">cleanup</span><span class="tag">teardown</span></td>
+        <td>Registers cleanup callbacks and reports teardown failures clearly.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="notification toast snackbar alert status message wait visible hidden dismiss">
+        <td><code>wait_for_notification / dismiss_notification</code></td>
+        <td>Notifications</td>
+        <td><span class="tag">toast</span><span class="tag">notification</span></td>
+        <td>Waits for, validates, dismisses, and checks notification UI states.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="soft assertions grouped failures assert all collect validation">
+        <td><code>SoftAssert / soft_assert</code></td>
+        <td>Assertions</td>
+        <td><span class="tag">soft assertion</span><span class="tag">validation</span></td>
+        <td>Collects multiple assertion failures and reports them together.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="accessibility a11y page title html lang heading visible alt text images accessible name">
+        <td><code>assert_page_title / assert_heading_visible</code></td>
+        <td>Accessibility</td>
+        <td><span class="tag">a11y</span><span class="tag">smoke</span></td>
+        <td>Runs lightweight accessibility checks for title, language, headings, image alt text, and accessible names.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="visual screenshot page element baseline mask allure attach comparison">
+        <td><code>capture_page_screenshot / assert_screenshot_matches_baseline</code></td>
+        <td>Visual</td>
+        <td><span class="tag">screenshot</span><span class="tag">baseline</span></td>
+        <td>Captures screenshots and compares them to simple dependency-free baselines.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="saucedemo business flows login cart checkout add product reusable">
+        <td><code>login_as / checkout_product</code></td>
+        <td>SauceDemo Flows</td>
+        <td><span class="tag">business flow</span><span class="tag">saucedemo</span></td>
+        <td>Reusable SauceDemo login, cart, and checkout business workflows.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="date time today tomorrow yesterday timezone format parse add days">
+        <td><code>today / tomorrow / add_days</code></td>
+        <td>Date/Time</td>
+        <td><span class="tag">date</span><span class="tag">timezone</span></td>
+        <td>Date arithmetic, formatting, parsing, and relative-date helpers.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="url query params build parse assert remove navigation">
+        <td><code>build_url / assert_url_contains_param</code></td>
+        <td>URL</td>
+        <td><span class="tag">url</span><span class="tag">query</span></td>
+        <td>Builds URLs and validates query parameters.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="env environment secrets mask required optional validate">
+        <td><code>require_env / mask_secret</code></td>
+        <td>Environment</td>
+        <td><span class="tag">env</span><span class="tag">secrets</span></td>
+        <td>Reads required environment variables and masks secrets for logs.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="csv json file validation headers row count nested field">
+        <td><code>assert_csv_headers / assert_json_file_field</code></td>
+        <td>Files</td>
+        <td><span class="tag">csv</span><span class="tag">json</span></td>
+        <td>Reads and validates structured CSV and JSON files.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+      <tr data-search="table grid rows sorting cell text playwright locator">
+        <td><code>assert_table_contains_row / extract_table_rows</code></td>
+        <td>Table</td>
+        <td><span class="tag">table</span><span class="tag">grid</span></td>
+        <td>Extracts and validates table rows, cells, and sort order.</td>
+        <td><a href="FRAMEWORK_HELPERS.md">Open docs</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <script>
+    const search = document.getElementById("search");
+    const rows = Array.from(document.querySelectorAll("#helpers tr"));
+    search.addEventListener("input", () => {
+      const query = search.value.toLowerCase().trim();
+      rows.forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(query) || row.dataset.search.includes(query)
+          ? ""
+          : "none";
+      });
+    });
+  </script>
+</body>
+</html>

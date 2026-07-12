@@ -1,0 +1,8 @@
+pytest==8.3.4
+playwright==1.49.1
+pytest-playwright==0.6.2
+pytest-xdist==3.6.1
+pytest-rerunfailures==15.0
+allure-pytest==2.13.5
+PyYAML==6.0.2
+requests==2.34.2

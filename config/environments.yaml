@@ -1,0 +1,8 @@
+qa:
+  base_url: "https://www.saucedemo.com/"
+
+staging:
+  base_url: "https://www.saucedemo.com/"
+
+prod:
+  base_url: "https://www.saucedemo.com/"

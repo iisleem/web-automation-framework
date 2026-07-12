@@ -1,0 +1,44 @@
+name: Python Playwright Tests
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          playwright install --with-deps
+          mkdir -p reports screenshots videos traces
+
+      - name: Run Playwright tests
+        run: |
+          python scripts/run_browser_matrix.py --browsers chromium --env qa -n 2 --no-open-report
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-artifacts
+          path: |
+            reports
+            screenshots
+            videos
+            traces
+          if-no-files-found: warn
