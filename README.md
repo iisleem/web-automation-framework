@@ -673,6 +673,20 @@ Open the searchable catalog from the CLI:
 python framework.py helpers
 ```
 
+Helper configuration at a glance:
+
+| Helper area | Extra setup needed? | Notes |
+| --- | --- | --- |
+| Email OTP | Yes | Set `TEST_EMAIL_USERNAME` and `TEST_EMAIL_PASSWORD` as environment variables. Use a test mailbox or app password, never a real password in code. |
+| API | Usually yes | Pass the target API base URL and headers/tokens from config or environment variables. |
+| Database | Project-specific | The built-in helper works with DB-API connections. SQLite works out of the box; PostgreSQL/MySQL projects should add the driver they use and pass a connection object. |
+| Auth/session | No global setup | Saves Playwright storage state to a file. Keep live auth state under ignored paths such as `data/auth/`. |
+| PDF | No | `pypdf` is installed through `requirements.txt`. Scanned image PDFs need OCR, which is intentionally out of scope. |
+| Security smoke | No | Tune expected headers/cookie names per application because demo or lower environments may not use production headers. |
+| Performance smoke | No | Tune timing/resource thresholds per environment; CI runners can be slower than local machines. |
+| i18n | No | Pass expected locale/language selectors from the application under test. |
+| Browser/file/network/form/table/helpers | No | Use directly from `utils.helpers.*` with Playwright pages, locators, files, or response objects. |
+
 Current helper categories:
 
 - Email OTP helpers using IMAP
