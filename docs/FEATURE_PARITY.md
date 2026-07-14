@@ -19,6 +19,7 @@ when it is environment-neutral; browser-specific behavior stays in this reposito
 | Official Allure | Optional | Use `--report-kind allure` or `--report-kind both` when official Allure HTML is needed. |
 | Failure artifacts | Supported | Failed tests capture screenshots, Playwright traces, videos, and Allure attachments. |
 | Helper catalog | Supported | `docs/FRAMEWORK_HELPERS.md` and `docs/helpers_catalog.html` document reusable web automation helpers. |
+| Starter template | Supported | GitHub template repository plus `templates/starter_project/` for product-specific pages, flows, tests, and config. |
 
 ## Reporting Modes
 

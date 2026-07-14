@@ -1,0 +1,8 @@
+local:
+  base_url: "https://app-under-test.local"
+
+qa:
+  base_url: "https://qa.app-under-test.example"
+
+staging:
+  base_url: "https://staging.app-under-test.example"
