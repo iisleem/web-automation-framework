@@ -46,13 +46,13 @@ def assert_download_filename(
 ) -> Path:
     file_path = assert_file_exists(path)
     if contains:
-        assert expected_filename in file_path.name, (
-            f"Expected downloaded filename to contain {expected_filename!r}, got {file_path.name!r}"
-        )
+        assert (
+            expected_filename in file_path.name
+        ), f"Expected downloaded filename to contain {expected_filename!r}, got {file_path.name!r}"
     else:
-        assert file_path.name == expected_filename, (
-            f"Expected downloaded filename {expected_filename!r}, got {file_path.name!r}"
-        )
+        assert (
+            file_path.name == expected_filename
+        ), f"Expected downloaded filename {expected_filename!r}, got {file_path.name!r}"
     return file_path
 
 
@@ -68,7 +68,5 @@ def assert_file_contains(
 ) -> Path:
     file_path = assert_file_exists(path)
     content = file_path.read_text(encoding=encoding)
-    assert expected_text in content, (
-        f"Expected file {file_path} to contain {expected_text!r}"
-    )
+    assert expected_text in content, f"Expected file {file_path} to contain {expected_text!r}"
     return file_path

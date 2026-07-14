@@ -40,9 +40,7 @@ def assert_heading_visible(
     assert locator.is_visible(), f"Expected heading {heading_text!r} to be visible"
     if mode == "contains":
         actual_text = locator.inner_text()
-        assert heading_text in actual_text, (
-            f"Expected heading text to contain {heading_text!r}, got {actual_text!r}"
-        )
+        assert heading_text in actual_text, f"Expected heading text to contain {heading_text!r}, got {actual_text!r}"
     return locator
 
 
@@ -71,9 +69,7 @@ def assert_element_accessible_name(
 def assert_minimum_heading_count(page: Any, minimum_count: int = 1) -> int:
     headings = page.get_by_role("heading")
     count = headings.count()
-    assert count >= minimum_count, (
-        f"Expected at least {minimum_count} heading(s), found {count}"
-    )
+    assert count >= minimum_count, f"Expected at least {minimum_count} heading(s), found {count}"
     return count
 
 

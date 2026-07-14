@@ -39,25 +39,17 @@ class SoftAssert:
     def assert_equal(self, actual: Any, expected: Any, message: str = "") -> None:
         if actual != expected:
             failure_message = message or f"Expected {expected!r}, got {actual!r}"
-            self.failures.append(
-                SoftAssertionFailure(description=failure_message, message=failure_message)
-            )
+            self.failures.append(SoftAssertionFailure(description=failure_message, message=failure_message))
 
     def assert_contains(self, actual: str, expected_substring: str, message: str = "") -> None:
         if expected_substring not in actual:
-            failure_message = message or (
-                f"Expected {actual!r} to contain {expected_substring!r}"
-            )
-            self.failures.append(
-                SoftAssertionFailure(description=failure_message, message=failure_message)
-            )
+            failure_message = message or (f"Expected {actual!r} to contain {expected_substring!r}")
+            self.failures.append(SoftAssertionFailure(description=failure_message, message=failure_message))
 
     def assert_in(self, member: Any, container: Any, message: str = "") -> None:
         if member not in container:
             failure_message = message or f"Expected {member!r} to exist in {container!r}"
-            self.failures.append(
-                SoftAssertionFailure(description=failure_message, message=failure_message)
-            )
+            self.failures.append(SoftAssertionFailure(description=failure_message, message=failure_message))
 
     def assert_all(self) -> None:
         assert not self.failures, self.format_failures()

@@ -59,13 +59,11 @@ def assert_active_element_text(
 ) -> None:
     actual_text = get_active_element_text(page)
     if contains:
-        assert expected_text in actual_text, (
-            f"Expected active element text to contain {expected_text!r}, got {actual_text!r}"
-        )
+        assert (
+            expected_text in actual_text
+        ), f"Expected active element text to contain {expected_text!r}, got {actual_text!r}"
         return
-    assert actual_text == expected_text, (
-        f"Expected active element text to be {expected_text!r}, got {actual_text!r}"
-    )
+    assert actual_text == expected_text, f"Expected active element text to be {expected_text!r}, got {actual_text!r}"
 
 
 def _validate_positive_times(times: int) -> None:

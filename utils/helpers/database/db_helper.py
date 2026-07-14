@@ -77,9 +77,9 @@ def assert_row_count(
     params: Iterable[Any] | None = None,
 ) -> None:
     actual_count = client.scalar(sql, params)
-    assert actual_count == expected_count, (
-        f"Expected database row count {expected_count}, got {actual_count}. Query: {sql}"
-    )
+    assert (
+        actual_count == expected_count
+    ), f"Expected database row count {expected_count}, got {actual_count}. Query: {sql}"
 
 
 def assert_table_exists(client: DatabaseClient, table_name: str) -> None:

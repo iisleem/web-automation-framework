@@ -52,13 +52,9 @@ def assert_notification_visible(
 
     actual_text = locator.inner_text()
     if contains:
-        assert expected_text in actual_text, (
-            f"Expected notification to contain {expected_text!r}, got {actual_text!r}"
-        )
+        assert expected_text in actual_text, f"Expected notification to contain {expected_text!r}, got {actual_text!r}"
         return locator
-    assert actual_text == expected_text, (
-        f"Expected notification to be {expected_text!r}, got {actual_text!r}"
-    )
+    assert actual_text == expected_text, f"Expected notification to be {expected_text!r}, got {actual_text!r}"
     return locator
 
 

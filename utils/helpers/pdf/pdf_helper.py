@@ -32,9 +32,7 @@ def assert_pdf_page_count(
     password: str | None = None,
 ) -> None:
     actual_count = get_pdf_page_count(path, password=password)
-    assert actual_count == expected_count, (
-        f"Expected PDF {path!s} to have {expected_count} pages, got {actual_count}"
-    )
+    assert actual_count == expected_count, f"Expected PDF {path!s} to have {expected_count} pages, got {actual_count}"
 
 
 def assert_pdf_contains_text(
@@ -44,9 +42,7 @@ def assert_pdf_contains_text(
     password: str | None = None,
 ) -> None:
     actual_text = read_pdf_text(path, password=password)
-    assert expected_text in actual_text, (
-        f"Expected PDF {path!s} to contain {expected_text!r}."
-    )
+    assert expected_text in actual_text, f"Expected PDF {path!s} to contain {expected_text!r}."
 
 
 def assert_pdf_metadata_contains(
@@ -58,9 +54,9 @@ def assert_pdf_metadata_contains(
 ) -> None:
     metadata = get_pdf_metadata(path, password=password)
     actual_value = metadata.get(key)
-    assert actual_value == expected_value, (
-        f"Expected PDF metadata {key!r} to be {expected_value!r}, got {actual_value!r}"
-    )
+    assert (
+        actual_value == expected_value
+    ), f"Expected PDF metadata {key!r} to be {expected_value!r}, got {actual_value!r}"
 
 
 def _reader(path: Path | str, *, password: str | None = None) -> PdfReader:

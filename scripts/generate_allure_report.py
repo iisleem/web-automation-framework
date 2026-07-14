@@ -16,9 +16,7 @@ from utils.reporting import (
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Generate framework reports from Allure result files."
-    )
+    parser = argparse.ArgumentParser(description="Generate framework reports from Allure result files.")
     parser.add_argument(
         "--results",
         default="reports/allure-results",

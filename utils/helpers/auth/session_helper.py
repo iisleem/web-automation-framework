@@ -65,7 +65,6 @@ def assert_storage_state_has_origin(path: Path | str, origin: str) -> dict[str, 
     state = read_storage_state(path)
     origins = {entry.get("origin") for entry in state.get("origins", [])}
     assert origin in origins, (
-        f"Expected storage state {path!s} to contain origin {origin!r}. "
-        f"Available origins: {sorted(origins)!r}"
+        f"Expected storage state {path!s} to contain origin {origin!r}. " f"Available origins: {sorted(origins)!r}"
     )
     return state

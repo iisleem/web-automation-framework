@@ -981,10 +981,11 @@ The pipeline:
 3. Installs dependencies from `requirements.txt`.
 4. Installs Playwright browsers with system dependencies.
 5. Runs `ruff check .` for syntax/import lint coverage.
-6. Runs the browser matrix runner in parallel with Chromium.
-7. Skips the intentional reporting demo by default.
-8. Generates the browser matrix dashboard and browser drill-down report.
-9. Uploads reports, screenshots, videos, and traces as artifacts.
+6. Runs `ruff format --check .` to enforce consistent formatting.
+7. Runs the browser matrix runner in parallel with Chromium.
+8. Skips the intentional reporting demo by default.
+9. Generates the browser matrix dashboard and browser drill-down report.
+10. Uploads reports, screenshots, videos, and traces as artifacts.
 
 ## Troubleshooting
 

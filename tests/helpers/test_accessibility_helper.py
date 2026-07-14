@@ -90,9 +90,7 @@ def test_assert_images_have_alt_text_passes_when_all_images_have_alt():
 
 def test_assert_images_have_alt_text_fails_when_image_missing_alt():
     page = FakePage()
-    page.locators["img"] = FakeLocator(
-        children=[FakeLocator(attributes={"src": "/missing.png"})]
-    )
+    page.locators["img"] = FakeLocator(children=[FakeLocator(attributes={"src": "/missing.png"})])
 
     with pytest.raises(AssertionError, match="/missing.png"):
         assert_images_have_alt_text(page)
@@ -108,8 +106,6 @@ def test_assert_element_accessible_name_requires_matching_role():
 
 def test_assert_minimum_heading_count():
     page = FakePage()
-    page.role_locators[("heading", None, None)] = FakeLocator(
-        children=[FakeLocator(), FakeLocator()]
-    )
+    page.role_locators[("heading", None, None)] = FakeLocator(children=[FakeLocator(), FakeLocator()])
 
     assert assert_minimum_heading_count(page, 2) == 2

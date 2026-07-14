@@ -23,9 +23,5 @@ def test_sort_products_by_name_and_price(page, base_url, users, sort_option, fie
     login_page.login(**users["standard_user"])
     inventory_page.sort_products(sort_option)
 
-    values = (
-        inventory_page.get_product_names()
-        if field == "name"
-        else inventory_page.get_product_prices()
-    )
+    values = inventory_page.get_product_names() if field == "name" else inventory_page.get_product_prices()
     assert_list_sorted(values, reverse=reverse)

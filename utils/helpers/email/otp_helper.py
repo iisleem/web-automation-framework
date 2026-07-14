@@ -51,8 +51,5 @@ class EmailOtpHelper:
             ),
             timeout_seconds=timeout_seconds,
             interval_seconds=interval_seconds,
-            failure_message=(
-                "OTP email was not found. "
-                f"sender={sender!r}, subject_contains={subject_contains!r}"
-            ),
+            failure_message=("OTP email was not found. " f"sender={sender!r}, subject_contains={subject_contains!r}"),
         )

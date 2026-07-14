@@ -117,9 +117,7 @@ def main() -> int:
 
 
 def _parse_args() -> tuple[argparse.Namespace, list[str]]:
-    parser = argparse.ArgumentParser(
-        description="Run pytest once per browser and build a browser matrix dashboard."
-    )
+    parser = argparse.ArgumentParser(description="Run pytest once per browser and build a browser matrix dashboard.")
     parser.add_argument(
         "--browsers",
         nargs="+",

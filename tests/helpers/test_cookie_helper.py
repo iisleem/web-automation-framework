@@ -56,9 +56,7 @@ def test_get_cookie_returns_matching_cookie():
 
 
 def test_cookie_assertions_return_cookie():
-    context = FakeContext(
-        cookies=[{"name": "session", "value": "abc", "sameSite": "Lax"}]
-    )
+    context = FakeContext(cookies=[{"name": "session", "value": "abc", "sameSite": "Lax"}])
 
     assert_cookie_exists(context, "session")
     assert_cookie_value(context, "session", "abc")
@@ -95,9 +93,7 @@ def test_delete_cookie_passes_filters_to_context():
 
     delete_cookie(context, "session", domain="example.test", path="/")
 
-    assert context.clear_calls == [
-        {"name": "session", "domain": "example.test", "path": "/"}
-    ]
+    assert context.clear_calls == [{"name": "session", "domain": "example.test", "path": "/"}]
     assert context.cookies() == []
 
 

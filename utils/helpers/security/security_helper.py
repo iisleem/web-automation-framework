@@ -50,9 +50,7 @@ def assert_cookie_security_flags(
     http_only: bool = True,
     same_site_values: tuple[str, ...] = ("Lax", "Strict", "None"),
 ) -> None:
-    selected_cookies = [
-        cookie for cookie in cookies if cookie_names is None or cookie.get("name") in cookie_names
-    ]
+    selected_cookies = [cookie for cookie in cookies if cookie_names is None or cookie.get("name") in cookie_names]
     assert selected_cookies, f"Expected cookies to validate. Requested: {cookie_names!r}"
 
     failures: list[str] = []

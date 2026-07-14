@@ -44,9 +44,7 @@ def clear_fields(page: Any, selectors: list[str]) -> None:
 
 def assert_field_value(page: Any, selector: str, expected_value: str) -> None:
     actual_value = page.locator(selector).input_value()
-    assert actual_value == expected_value, (
-        f"Expected field {selector!r} value {expected_value!r}, got {actual_value!r}"
-    )
+    assert actual_value == expected_value, f"Expected field {selector!r} value {expected_value!r}, got {actual_value!r}"
 
 
 def assert_checkbox_checked(
@@ -56,9 +54,7 @@ def assert_checkbox_checked(
     expected: bool = True,
 ) -> None:
     actual = page.locator(selector).is_checked()
-    assert actual is expected, (
-        f"Expected checkbox {selector!r} checked state {expected}, got {actual}"
-    )
+    assert actual is expected, f"Expected checkbox {selector!r} checked state {expected}, got {actual}"
 
 
 def assert_validation_message(
@@ -71,13 +67,11 @@ def assert_validation_message(
     actual_text = page.locator(selector).inner_text()
     if contains:
         assert expected_text in actual_text, (
-            f"Expected validation message {selector!r} to contain {expected_text!r}, "
-            f"got {actual_text!r}"
+            f"Expected validation message {selector!r} to contain {expected_text!r}, " f"got {actual_text!r}"
         )
         return
     assert actual_text == expected_text, (
-        f"Expected validation message {selector!r} to be {expected_text!r}, "
-        f"got {actual_text!r}"
+        f"Expected validation message {selector!r} to be {expected_text!r}, " f"got {actual_text!r}"
     )
 
 

@@ -45,7 +45,7 @@ def assert_upload_file_ready(
     file_path = assert_file_exists(path)
     if max_size_bytes is not None:
         size = file_path.stat().st_size
-        assert size <= max_size_bytes, (
-            f"Expected upload file {file_path} to be at most {max_size_bytes} bytes, got {size}"
-        )
+        assert (
+            size <= max_size_bytes
+        ), f"Expected upload file {file_path} to be at most {max_size_bytes} bytes, got {size}"
     return file_path

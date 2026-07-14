@@ -27,9 +27,7 @@ def assert_cookie_value(
 ) -> dict[str, Any]:
     cookie = assert_cookie_exists(context_or_page, name)
     actual_value = cookie.get("value")
-    assert actual_value == expected_value, (
-        f"Expected cookie {name!r} value {expected_value!r}, got {actual_value!r}"
-    )
+    assert actual_value == expected_value, f"Expected cookie {name!r} value {expected_value!r}, got {actual_value!r}"
     return cookie
 
 
@@ -42,8 +40,7 @@ def assert_cookie_attribute(
     cookie = assert_cookie_exists(context_or_page, name)
     actual_value = cookie.get(attribute)
     assert actual_value == expected_value, (
-        f"Expected cookie {name!r} attribute {attribute!r} to be {expected_value!r}, "
-        f"got {actual_value!r}"
+        f"Expected cookie {name!r} attribute {attribute!r} to be {expected_value!r}, " f"got {actual_value!r}"
     )
     return cookie
 

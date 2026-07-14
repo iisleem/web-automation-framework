@@ -10,6 +10,7 @@
 
 - [ ] `python -m compileall -q framework.py conftest.py pages flows utils scripts tests`
 - [ ] `python -m ruff check .`
+- [ ] `python -m ruff format --check .`
 - [ ] `python framework.py run --helpers --no-open-report --no-generate-report`
 - [ ] `python framework.py run --smoke --browser chromium --report-kind core --no-open-report`
 - [ ] Browser matrix was run where relevant: `python scripts/run_browser_matrix.py --browsers chromium --env qa -m smoke --report-kind core --no-open-report`
