@@ -1,19 +1,23 @@
 from collections.abc import Generator
 from pathlib import Path
 import re
-import subprocess
 
 import allure
 import pytest
 from playwright.sync_api import Browser, Error, Page
 
-from utils.allure_cli import get_or_install_allure_cli
 from utils.config_reader import ConfigReader
 from utils.data_reader import DataReader
 from utils.helpers.email import EmailOtpHelper, ImapEmailClient
 from utils.logger import get_logger
 from utils.report_opener import open_report
-from utils.report_generator import generate_html_report
+from utils.reporting import (
+    VALID_REPORT_KINDS,
+    build_web_report_metadata,
+    configured_report_kind,
+    finalize_web_report,
+    primary_report_path,
+)
 from utils.screenshot_helper import capture_screenshot
 
 
@@ -48,6 +52,13 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         default=False,
         help="Do not open the generated HTML report in the default browser.",
     )
+    group.addoption(
+        "--report-kind",
+        action="store",
+        choices=VALID_REPORT_KINDS,
+        default=None,
+        help="Post-run report kind: core, allure, both, or summary. Defaults to config/settings.yaml.",
+    )
 
 
 def pytest_configure() -> None:
@@ -79,7 +90,7 @@ def pytest_sessionfinish(
     if session.config.getoption("--no-generate-report"):
         return
 
-    report_path = _generate_report_after_session()
+    report_path = _generate_report_after_session(session.config)
     if report_path and not session.config.getoption("--no-open-report"):
         _open_report_if_local(report_path)
 
@@ -285,37 +296,37 @@ def _attach_file(
         LOGGER.error("Could not attach %s to Allure: %s", path, error)
 
 
-def _generate_report_after_session() -> Path | None:
+def _generate_report_after_session(config: pytest.Config) -> Path | None:
+    framework_config = _load_framework_config_for_reporting(config)
     results_dir = PROJECT_ROOT / "reports" / "allure-results"
-    output_dir = PROJECT_ROOT / "reports" / "allure-report"
-    allure_executable = get_or_install_allure_cli(PROJECT_ROOT, LOGGER)
-
+    report_kind = configured_report_kind(PROJECT_ROOT, config.getoption("--report-kind"))
+    metadata = build_web_report_metadata(
+        PROJECT_ROOT,
+        framework_config=framework_config,
+        browser=config.getoption("browser", default=None),
+    )
     try:
-        if allure_executable:
-            subprocess.run(
-                [
-                    allure_executable,
-                    "generate",
-                    str(results_dir),
-                    "-o",
-                    str(output_dir),
-                    "--clean",
-                ],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-            report_path = output_dir / "index.html"
-            LOGGER.info("Generated Allure report: %s", report_path)
-            return report_path
-
-        report_path = generate_html_report(results_dir, output_dir)
-        LOGGER.info("Generated built-in HTML report: %s", report_path)
-        return report_path
+        result = finalize_web_report(
+            project_root=PROJECT_ROOT,
+            results_dir=results_dir,
+            report_kind=report_kind,
+            metadata=metadata,
+            logger=LOGGER,
+        )
+        return primary_report_path(result)
     except Exception as error:
-        LOGGER.warning("Could not generate HTML report after test session: %s", error)
+        LOGGER.warning("Could not generate report after test session: %s", error)
         return None
 
 
 def _open_report_if_local(report_path: Path) -> None:
     open_report(report_path, LOGGER)
+
+
+def _load_framework_config_for_reporting(config: pytest.Config) -> dict:
+    try:
+        env_name = config.getoption("--env")
+        return ConfigReader(PROJECT_ROOT).load(env_name)
+    except Exception as error:
+        LOGGER.warning("Could not load framework metadata for report: %s", error)
+        return {}
