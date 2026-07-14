@@ -118,8 +118,10 @@ readable scenarios.
 | Goal | Command |
 | --- | --- |
 | Run smoke tests | `python framework.py run --smoke --browser chromium` |
+| Run real Chrome channel | `python framework.py run --smoke --browser chrome` |
+| Run Safari-engine coverage | `python framework.py run --smoke --browser safari` |
 | Run headed for debugging | `python framework.py run --smoke --browser chromium --headed` |
-| Run browser matrix | `python framework.py run --browsers chromium firefox webkit --smoke` |
+| Run browser matrix | `python framework.py run --browsers chromium chrome safari --smoke` |
 | Generate core report | `python framework.py report generate --report-kind core --no-open` |
 | Generate core plus official Allure | `python framework.py report generate --report-kind both --no-open` |
 | Skip report opening | `--no-open-report` |

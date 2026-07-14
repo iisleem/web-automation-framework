@@ -13,7 +13,7 @@ when it is environment-neutral; browser-specific behavior stays in this reposito
 | Pytest execution | Supported | Markers, pytest-xdist workers, pytest reruns, and passthrough pytest args are supported. |
 | Page Object Model | Supported | Page objects live under `pages/`; tests keep locators out of test files. |
 | SauceDemo sample | Supported | Smoke, regression, and e2e tests demonstrate login, cart, sorting, checkout, negative validation, and reporting artifacts. |
-| Browser selection | Supported | Chromium, Firefox, and WebKit are supported through pytest-playwright. |
+| Browser selection | Supported | Chromium, Firefox, WebKit, Google Chrome channel, Microsoft Edge channel, and Safari-engine/WebKit aliases are supported through Playwright. |
 | Browser matrix | Supported | `scripts/run_browser_matrix.py` runs one suite per browser and builds `reports/browser-matrix/index.html`. |
 | Reports | Supported | Core product report is the default at `reports/automation-report/index.html`. |
 | Official Allure | Optional | Use `--report-kind allure` or `--report-kind both` when official Allure HTML is needed. |
