@@ -74,8 +74,5 @@ def assert_cleanup_success(results: list[CleanupResult]) -> None:
 
 
 def _format_cleanup_failures(failures: list[CleanupResult]) -> str:
-    details = [
-        f"{failure.name}: {type(failure.error).__name__}: {failure.error}"
-        for failure in failures
-    ]
+    details = [f"{failure.name}: {type(failure.error).__name__}: {failure.error}" for failure in failures]
     return "Cleanup actions failed:\n" + "\n".join(details)

@@ -32,9 +32,9 @@ def assert_file_exists(path: Path | str) -> Path:
 def assert_file_extension(path: Path | str, expected_extension: str) -> Path:
     file_path = assert_file_exists(path)
     normalized_extension = expected_extension if expected_extension.startswith(".") else f".{expected_extension}"
-    assert file_path.suffix == normalized_extension, (
-        f"Expected file extension {normalized_extension}, got {file_path.suffix}"
-    )
+    assert (
+        file_path.suffix == normalized_extension
+    ), f"Expected file extension {normalized_extension}, got {file_path.suffix}"
     return file_path
 
 

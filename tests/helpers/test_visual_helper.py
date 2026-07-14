@@ -45,9 +45,7 @@ def test_capture_page_screenshot_writes_file_and_passes_options(tmp_path):
 
     assert result == output_path
     assert output_path.read_bytes() == b"fake-page-png"
-    assert page.calls == [
-        {"path": str(output_path), "full_page": False, "mask": ["dynamic"]}
-    ]
+    assert page.calls == [{"path": str(output_path), "full_page": False, "mask": ["dynamic"]}]
 
 
 def test_capture_element_screenshot_writes_file(tmp_path):

@@ -19,9 +19,7 @@ def assert_csv_headers(path: Path | str, expected_headers: list[str]) -> None:
     with file_path.open("r", encoding="utf-8", newline="") as file:
         reader = csv.reader(file)
         actual_headers = next(reader, [])
-    assert actual_headers == expected_headers, (
-        f"Expected CSV headers {expected_headers}, got {actual_headers}"
-    )
+    assert actual_headers == expected_headers, f"Expected CSV headers {expected_headers}, got {actual_headers}"
 
 
 def assert_csv_row_count(path: Path | str, expected_count: int) -> None:
@@ -42,9 +40,9 @@ def assert_json_file_field(
 ) -> None:
     data = read_json_file(path)
     actual_value = _get_nested_value(data, field_path)
-    assert actual_value == expected_value, (
-        f"Expected JSON file field '{field_path}' to be {expected_value!r}, got {actual_value!r}"
-    )
+    assert (
+        actual_value == expected_value
+    ), f"Expected JSON file field '{field_path}' to be {expected_value!r}, got {actual_value!r}"
 
 
 def _get_nested_value(data: Any, field_path: str) -> Any:

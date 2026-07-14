@@ -16,9 +16,7 @@ def assert_true(condition: bool, message: str) -> None:
 
 def assert_contains(actual: str, expected_substring: str, message: str = "") -> None:
     with allure.step(message or f"Verify text contains '{expected_substring}'"):
-        assert expected_substring in actual, (
-            message or f"Expected {actual!r} to contain {expected_substring!r}"
-        )
+        assert expected_substring in actual, message or f"Expected {actual!r} to contain {expected_substring!r}"
 
 
 def assert_list_sorted(
@@ -29,6 +27,4 @@ def assert_list_sorted(
     expected = sorted(actual, reverse=reverse)
     direction = "descending" if reverse else "ascending"
     with allure.step(message or f"Verify list is sorted {direction}"):
-        assert list(actual) == expected, (
-            message or f"Expected {list(actual)!r} to be sorted {direction}"
-        )
+        assert list(actual) == expected, message or f"Expected {list(actual)!r} to be sorted {direction}"

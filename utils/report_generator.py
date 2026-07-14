@@ -42,10 +42,7 @@ def read_allure_results(results_dir: Path) -> list[dict[str, Any]]:
 
 
 def summarize_results(tests: list[dict[str, Any]]) -> dict[str, Any]:
-    counts = {
-        status: sum(1 for test in tests if test["status"] == status)
-        for status in STATUS_ORDER
-    }
+    counts = {status: sum(1 for test in tests if test["status"] == status) for status in STATUS_ORDER}
     total = len(tests)
     passed = counts.get("passed", 0)
     failed = counts.get("failed", 0) + counts.get("broken", 0)
@@ -85,10 +82,7 @@ def _duration_ms(result: dict[str, Any]) -> int:
 
 def _render_html(tests: list[dict[str, Any]]) -> str:
     total = len(tests)
-    counts = {
-        status: sum(1 for test in tests if test["status"] == status)
-        for status in STATUS_ORDER
-    }
+    counts = {status: sum(1 for test in tests if test["status"] == status) for status in STATUS_ORDER}
     rows = "\n".join(_render_row(test) for test in tests)
 
     return f"""<!doctype html>
@@ -253,11 +247,7 @@ def _matrix_totals(browser_runs: list[dict[str, Any]]) -> dict[str, Any]:
         summary = run["summary"]
         for key in ("total", "passed", "failed", "broken", "skipped", "duration_ms"):
             totals[key] += summary[key]
-    totals["pass_rate"] = (
-        round((totals["passed"] / totals["total"]) * 100, 2)
-        if totals["total"]
-        else 0
-    )
+    totals["pass_rate"] = round((totals["passed"] / totals["total"]) * 100, 2) if totals["total"] else 0
     return totals
 
 

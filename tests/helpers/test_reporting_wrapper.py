@@ -78,9 +78,7 @@ def test_framework_cli_accepts_report_kind_options():
     parser = framework._build_parser()
 
     run_args, _ = parser.parse_known_args(["run", "--report-kind", "both"])
-    generate_args, _ = parser.parse_known_args(
-        ["report", "generate", "--report-kind", "allure", "--no-open"]
-    )
+    generate_args, _ = parser.parse_known_args(["report", "generate", "--report-kind", "allure", "--no-open"])
 
     assert run_args.report_kind == "both"
     assert generate_args.report_kind == "allure"

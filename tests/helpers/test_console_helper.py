@@ -58,9 +58,7 @@ def test_console_tracker_ignores_configured_patterns():
         ignored_text_patterns=["*ResizeObserver*"],
     )
 
-    page.handlers["console"](
-        FakeConsoleMessage(level="error", text="ResizeObserver loop limit exceeded")
-    )
+    page.handlers["console"](FakeConsoleMessage(level="error", text="ResizeObserver loop limit exceeded"))
 
     assert tracker.entries == []
 
@@ -71,9 +69,7 @@ def test_console_tracker_records_page_errors():
 
     page.handlers["pageerror"](RuntimeError("Unhandled exception"))
 
-    assert tracker.entries == [
-        ConsoleEntry(level="pageerror", text="Unhandled exception")
-    ]
+    assert tracker.entries == [ConsoleEntry(level="pageerror", text="Unhandled exception")]
 
 
 def test_assert_no_console_errors_has_clear_message():

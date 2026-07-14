@@ -111,8 +111,7 @@ def assert_response_json_field(
     body = response_json(response)
     actual_value = _get_nested_value(body, field_path)
     assert actual_value == expected_value, (
-        f"Expected response JSON field '{field_path}' to be {expected_value!r}, "
-        f"got {actual_value!r}"
+        f"Expected response JSON field '{field_path}' to be {expected_value!r}, " f"got {actual_value!r}"
     )
     return response
 
@@ -182,10 +181,7 @@ def _get_nested_value(body: Any, field_path: str) -> Any:
 
 def _format_failed_requests(failed_requests: list[FailedRequest]) -> str:
     lines = ["Expected no failed network requests, found:"]
-    lines.extend(
-        f"- {request.method} {request.url}: {request.failure_text}"
-        for request in failed_requests
-    )
+    lines.extend(f"- {request.method} {request.url}: {request.failure_text}" for request in failed_requests)
     return "\n".join(lines)
 
 

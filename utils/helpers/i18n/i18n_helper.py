@@ -20,18 +20,18 @@ def expected_direction_for_locale(locale: str) -> Direction:
 
 def assert_page_locale(page: Any, expected_locale: str) -> None:
     actual_locale = page.locator("html").get_attribute("lang")
-    assert normalize_locale(actual_locale or "") == normalize_locale(expected_locale), (
-        f"Expected page locale {expected_locale!r}, got {actual_locale!r}"
-    )
+    assert normalize_locale(actual_locale or "") == normalize_locale(
+        expected_locale
+    ), f"Expected page locale {expected_locale!r}, got {actual_locale!r}"
 
 
 def assert_page_direction(page: Any, expected_direction: Direction) -> None:
     actual_direction = page.locator("html").get_attribute("dir") or page.evaluate(
         "() => getComputedStyle(document.documentElement).direction"
     )
-    assert actual_direction == expected_direction, (
-        f"Expected page direction {expected_direction!r}, got {actual_direction!r}"
-    )
+    assert (
+        actual_direction == expected_direction
+    ), f"Expected page direction {expected_direction!r}, got {actual_direction!r}"
 
 
 def assert_locale_direction(page: Any, locale: str) -> None:

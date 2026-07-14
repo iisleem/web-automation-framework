@@ -39,9 +39,7 @@ def assert_page_load_under(
 ) -> dict[str, float]:
     timing = get_navigation_timing(page)
     actual = float(timing.get(metric, timing.get("duration", 0)))
-    assert actual <= max_ms, (
-        f"Expected page performance metric {metric!r} to be <= {max_ms} ms, got {actual} ms"
-    )
+    assert actual <= max_ms, f"Expected page performance metric {metric!r} to be <= {max_ms} ms, got {actual} ms"
     return timing
 
 
@@ -53,16 +51,10 @@ def assert_no_slow_resources(
 ) -> list[dict[str, Any]]:
     ignored = ignored_url_patterns or []
     resources = [
-        resource
-        for resource in get_resource_timings(page)
-        if not _matches_any(resource.get("name", ""), ignored)
+        resource for resource in get_resource_timings(page) if not _matches_any(resource.get("name", ""), ignored)
     ]
-    slow_resources = [
-        resource for resource in resources if float(resource.get("duration", 0)) > max_duration_ms
-    ]
-    assert not slow_resources, (
-        f"Expected no resources slower than {max_duration_ms} ms, got {slow_resources!r}"
-    )
+    slow_resources = [resource for resource in resources if float(resource.get("duration", 0)) > max_duration_ms]
+    assert not slow_resources, f"Expected no resources slower than {max_duration_ms} ms, got {slow_resources!r}"
     return resources
 
 
@@ -74,13 +66,9 @@ def assert_resource_count_under(
 ) -> list[dict[str, Any]]:
     resources = get_resource_timings(page)
     if resource_type:
-        resources = [
-            resource for resource in resources if resource.get("initiatorType") == resource_type
-        ]
+        resources = [resource for resource in resources if resource.get("initiatorType") == resource_type]
     actual_count = len(resources)
-    assert actual_count <= max_count, (
-        f"Expected resource count <= {max_count}, got {actual_count}"
-    )
+    assert actual_count <= max_count, f"Expected resource count <= {max_count}, got {actual_count}"
     return resources
 
 

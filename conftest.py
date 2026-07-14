@@ -149,17 +149,13 @@ def page(
 
     page = context.new_page()
     page.set_default_timeout(framework_config["timeouts"]["default_timeout_ms"])
-    page.set_default_navigation_timeout(
-        framework_config["timeouts"]["navigation_timeout_ms"]
-    )
+    page.set_default_navigation_timeout(framework_config["timeouts"]["navigation_timeout_ms"])
 
     LOGGER.info("Starting test: %s", request.node.nodeid)
     try:
         yield page
     finally:
-        failed = bool(
-            getattr(request.node, "rep_call", None) and request.node.rep_call.failed
-        )
+        failed = bool(getattr(request.node, "rep_call", None) and request.node.rep_call.failed)
         video = page.video
 
         if failed:
@@ -212,11 +208,7 @@ def _capture_and_attach_screenshot(
     framework_config: dict,
     test_name: str,
 ) -> None:
-    screenshot_path = (
-        PROJECT_ROOT
-        / framework_config["artifacts"]["screenshots_dir"]
-        / f"{test_name}.png"
-    )
+    screenshot_path = PROJECT_ROOT / framework_config["artifacts"]["screenshots_dir"] / f"{test_name}.png"
     try:
         capture_screenshot(page, screenshot_path)
         _attach_file(
@@ -235,9 +227,7 @@ def _stop_tracing(
     test_name: str,
     failed: bool,
 ) -> None:
-    trace_path = (
-        PROJECT_ROOT / framework_config["artifacts"]["traces_dir"] / f"{test_name}.zip"
-    )
+    trace_path = PROJECT_ROOT / framework_config["artifacts"]["traces_dir"] / f"{test_name}.zip"
     try:
         if failed:
             trace_path.parent.mkdir(parents=True, exist_ok=True)
@@ -260,11 +250,7 @@ def _handle_video(
         return
 
     if failed:
-        video_path = (
-            PROJECT_ROOT
-            / framework_config["artifacts"]["videos_dir"]
-            / f"{test_name}.webm"
-        )
+        video_path = PROJECT_ROOT / framework_config["artifacts"]["videos_dir"] / f"{test_name}.webm"
         try:
             video.save_as(str(video_path))
             video.delete()

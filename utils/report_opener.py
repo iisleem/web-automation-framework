@@ -27,11 +27,7 @@ def _should_open_via_http_server(report_path: Path) -> bool:
 
 def _is_official_allure_report(report_path: Path) -> bool:
     report_dir = report_path.parent
-    return (
-        report_path.name == "index.html"
-        and (report_dir / "app.js").exists()
-        and (report_dir / "widgets").exists()
-    )
+    return report_path.name == "index.html" and (report_dir / "app.js").exists() and (report_dir / "widgets").exists()
 
 
 def _is_browser_matrix_dashboard(report_path: Path) -> bool:
@@ -105,8 +101,7 @@ def _find_free_port() -> int:
 def _detached_process_kwargs() -> dict:
     if os.name == "nt":
         return {
-            "creationflags": subprocess.CREATE_NEW_PROCESS_GROUP
-            | subprocess.DETACHED_PROCESS,
+            "creationflags": subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
         }
     return {"start_new_session": True}
 

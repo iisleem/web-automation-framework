@@ -27,9 +27,9 @@ def assert_url_contains_param(url: str, name: str, expected_value: str | None = 
     actual_value = get_query_param(url, name)
     assert actual_value is not None, f"Expected URL to contain query parameter '{name}': {url}"
     if expected_value is not None:
-        assert actual_value == expected_value, (
-            f"Expected query parameter '{name}' to be {expected_value!r}, got {actual_value!r}"
-        )
+        assert (
+            actual_value == expected_value
+        ), f"Expected query parameter '{name}' to be {expected_value!r}, got {actual_value!r}"
 
 
 def remove_query_param(url: str, name: str) -> str:

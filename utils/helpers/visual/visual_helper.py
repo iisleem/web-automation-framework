@@ -57,9 +57,9 @@ def assert_screenshot_matches_baseline(
         return baseline
 
     assert baseline.is_file(), f"Expected baseline path to be a file: {baseline}"
-    assert actual.read_bytes() == baseline.read_bytes(), (
-        f"Screenshot does not match baseline.\nActual: {actual}\nBaseline: {baseline}"
-    )
+    assert (
+        actual.read_bytes() == baseline.read_bytes()
+    ), f"Screenshot does not match baseline.\nActual: {actual}\nBaseline: {baseline}"
     return baseline
 
 

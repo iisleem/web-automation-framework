@@ -88,7 +88,9 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--helpers", action="store_true", help="Run helper simulation/unit tests.")
     run_parser.add_argument("--reruns", help="Retry failed tests.")
     run_parser.add_argument("--reruns-delay", help="Delay between retries.")
-    run_parser.add_argument("--run-reporting-demo", action="store_true", help="Include the intentionally failing reporting demo.")
+    run_parser.add_argument(
+        "--run-reporting-demo", action="store_true", help="Include the intentionally failing reporting demo."
+    )
     run_parser.add_argument(
         "--report-kind",
         choices=VALID_REPORT_KINDS,
@@ -266,12 +268,8 @@ def _handle_report_command(args: argparse.Namespace) -> int:
 
     results_dir = (PROJECT_ROOT / args.results).resolve()
     output_dir = (PROJECT_ROOT / args.output).resolve() if args.output else None
-    allure_output_dir = (
-        (PROJECT_ROOT / args.allure_output).resolve() if args.allure_output else None
-    )
-    summary_output_dir = (
-        (PROJECT_ROOT / args.summary_output).resolve() if args.summary_output else None
-    )
+    allure_output_dir = (PROJECT_ROOT / args.allure_output).resolve() if args.allure_output else None
+    summary_output_dir = (PROJECT_ROOT / args.summary_output).resolve() if args.summary_output else None
     result = _generate_report(
         results_dir,
         report_kind=args.report_kind,
@@ -448,9 +446,7 @@ def _check_playwright_browsers(doctor: Doctor) -> None:
                 if executable_path.exists():
                     doctor.pass_(f"Playwright {browser_name} browser is installed")
                 else:
-                    doctor.fail(
-                        f"Playwright {browser_name} browser is missing. Run: playwright install"
-                    )
+                    doctor.fail(f"Playwright {browser_name} browser is missing. Run: playwright install")
     except Exception as error:
         doctor.fail(f"Could not inspect Playwright browsers: {error}")
 
@@ -490,16 +486,10 @@ def _check_email_env(doctor: Doctor) -> None:
         return
     username_env = email_config.get("username_env")
     password_env = email_config.get("password_env")
-    missing = [
-        env_name
-        for env_name in (username_env, password_env)
-        if env_name and not os.getenv(env_name)
-    ]
+    missing = [env_name for env_name in (username_env, password_env) if env_name and not os.getenv(env_name)]
     if missing:
         doctor.warn(
-            "Email helper env vars are not set: "
-            + ", ".join(missing)
-            + ". Required only for real IMAP/OTP scenarios."
+            "Email helper env vars are not set: " + ", ".join(missing) + ". Required only for real IMAP/OTP scenarios."
         )
     else:
         doctor.pass_("Email helper environment variables are available or not required")

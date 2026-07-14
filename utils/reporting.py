@@ -17,10 +17,7 @@ FRAMEWORK_NAME = "python-playwright-pytest"
 def normalize_report_kind(report_kind: str | None) -> ReportKind:
     kind = (report_kind or "core").strip().lower()
     if kind not in VALID_REPORT_KINDS:
-        raise ValueError(
-            f"Invalid report kind '{report_kind}'. Expected one of: "
-            + ", ".join(VALID_REPORT_KINDS)
-        )
+        raise ValueError(f"Invalid report kind '{report_kind}'. Expected one of: " + ", ".join(VALID_REPORT_KINDS))
     return kind  # type: ignore[return-value]
 
 
