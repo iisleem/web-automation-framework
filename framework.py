@@ -9,6 +9,16 @@ import subprocess
 import sys
 
 from utils.allure_cli import get_or_install_allure_cli
+from utils.browser_support import (
+    DEFAULT_BROWSER_NAMES,
+    OPTIONAL_CHANNEL_NAMES,
+    VALID_BROWSER_NAMES,
+    append_pytest_browser_args,
+    channel_install_hint,
+    channel_preflight_failure,
+    is_browser_channel_available,
+    resolve_browser_target,
+)
 from utils.config_reader import ConfigReader
 from utils.logger import get_logger
 from utils.report_opener import open_report
@@ -23,7 +33,7 @@ from utils.reporting import (
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 LOGGER = get_logger("framework-cli")
-VALID_BROWSERS = {"chromium", "firefox", "webkit"}
+VALID_BROWSERS = VALID_BROWSER_NAMES
 
 
 class Doctor:
@@ -75,8 +85,13 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser = subparsers.add_parser("run", help="Run tests locally or as a browser matrix.")
     run_parser.add_argument("--env", default="qa", help="Environment from config/environments.yaml.")
     run_parser.add_argument("--base-url", help="Override the environment base URL.")
-    run_parser.add_argument("--browser", choices=sorted(VALID_BROWSERS), help="Single browser for a normal pytest run.")
-    run_parser.add_argument("--browsers", nargs="+", choices=sorted(VALID_BROWSERS), help="Run a browser matrix.")
+    browser_help = "Browser name: chromium, firefox, webkit, chrome, msedge, or safari."
+    run_parser.add_argument(
+        "--browser", choices=sorted(VALID_BROWSERS), help=f"Single browser for a normal pytest run. {browser_help}"
+    )
+    run_parser.add_argument(
+        "--browsers", nargs="+", choices=sorted(VALID_BROWSERS), help=f"Run a browser matrix. {browser_help}"
+    )
     run_parser.add_argument("--browser-workers", type=int, help="Parallel browser suites for matrix execution.")
     run_parser.add_argument("--headed", action="store_true", help="Run browsers in headed mode.")
     run_parser.add_argument("-n", "--parallel", help="pytest-xdist worker count for test-case parallelism.")
@@ -193,7 +208,11 @@ def _run_tests(args: argparse.Namespace, extra_pytest_args: list[str]) -> int:
 
     command = [sys.executable, "-m", "pytest", "--env", args.env]
     if browsers:
-        command.extend(["--browser", browsers[0]])
+        channel_failure = channel_preflight_failure(browsers[0])
+        if channel_failure:
+            print(channel_failure, file=sys.stderr)
+            return 1
+        append_pytest_browser_args(command, browsers[0])
     if args.base_url:
         command.extend(["--base-url", args.base_url])
     if marker_expression:
@@ -440,13 +459,24 @@ def _check_playwright_browsers(doctor: Doctor) -> None:
 
     try:
         with sync_playwright() as playwright:
-            for browser_name in sorted(VALID_BROWSERS):
-                browser_type = getattr(playwright, browser_name)
+            for browser_name in sorted(DEFAULT_BROWSER_NAMES):
+                target = resolve_browser_target(browser_name)
+                browser_type = getattr(playwright, target.engine)
                 executable_path = Path(browser_type.executable_path)
                 if executable_path.exists():
                     doctor.pass_(f"Playwright {browser_name} browser is installed")
                 else:
                     doctor.fail(f"Playwright {browser_name} browser is missing. Run: playwright install")
+            for browser_name in sorted(OPTIONAL_CHANNEL_NAMES):
+                target = resolve_browser_target(browser_name)
+                try:
+                    if is_browser_channel_available(playwright, browser_name):
+                        doctor.pass_(f"Optional Playwright channel is available: {browser_name}")
+                except Exception:
+                    doctor.warn(
+                        f"Optional Playwright channel is unavailable: {browser_name}. "
+                        f"{channel_install_hint(target.channel or browser_name)}"
+                    )
     except Exception as error:
         doctor.fail(f"Could not inspect Playwright browsers: {error}")
 

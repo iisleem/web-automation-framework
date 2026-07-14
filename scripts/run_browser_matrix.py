@@ -12,6 +12,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from utils.config_reader import ConfigReader
+from utils.browser_support import (
+    VALID_BROWSER_NAMES,
+    append_pytest_browser_args,
+    browser_artifact_name,
+    channel_error_message,
+    channel_preflight_failure,
+)
 from utils.logger import get_logger
 from utils.report_opener import open_report
 from utils.report_generator import (
@@ -29,7 +36,7 @@ from utils.reporting import (
 
 
 LOGGER = get_logger("browser-matrix")
-VALID_BROWSERS = {"chromium", "firefox", "webkit"}
+VALID_BROWSERS = VALID_BROWSER_NAMES
 
 
 def main() -> int:
@@ -121,6 +128,7 @@ def _parse_args() -> tuple[argparse.Namespace, list[str]]:
     parser.add_argument(
         "--browsers",
         nargs="+",
+        choices=sorted(VALID_BROWSERS),
         help="Browsers to run. Defaults to execution.browsers in config/settings.yaml.",
     )
     parser.add_argument("--env", default="qa", help="Environment name.")
@@ -225,8 +233,8 @@ def _run_pytest_browser_matrix(
                 browser,
                 args,
                 extra_pytest_args,
-                results_root / browser,
-                logs_root / f"{browser}.log",
+                results_root / browser_artifact_name(browser),
+                logs_root / f"{browser_artifact_name(browser)}.log",
             )
             for browser in browsers
         ]
@@ -239,8 +247,8 @@ def _run_pytest_browser_matrix(
                 browser,
                 args,
                 extra_pytest_args,
-                results_root / browser,
-                logs_root / f"{browser}.log",
+                results_root / browser_artifact_name(browser),
+                logs_root / f"{browser_artifact_name(browser)}.log",
             ): browser
             for browser in browsers
         }
@@ -267,12 +275,27 @@ def _run_pytest_for_browser(
     results_dir.mkdir(parents=True, exist_ok=True)
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
+    channel_failure = channel_preflight_failure(browser)
+    if channel_failure:
+        command = ["<preflight>", browser]
+        _write_browser_log(log_path, command, None, preflight_message=channel_failure)
+        LOGGER.error(channel_failure)
+        LOGGER.info(
+            "Browser %s failed preflight. Log: %s",
+            browser,
+            log_path,
+        )
+        return {
+            "browser": browser,
+            "exit_code": 1,
+            "results_dir": results_dir,
+            "log_path": log_path,
+        }
+
     command = [
         sys.executable,
         "-m",
         "pytest",
-        "--browser",
-        browser,
         "--env",
         args.env,
         f"--alluredir={results_dir}",
@@ -280,6 +303,7 @@ def _run_pytest_for_browser(
         "--no-generate-report",
         "--no-open-report",
     ]
+    append_pytest_browser_args(command, browser)
     if args.markers:
         command.extend(["-m", args.markers])
     if args.base_url:
@@ -304,6 +328,10 @@ def _run_pytest_for_browser(
         text=True,
     )
     _write_browser_log(log_path, command, completed)
+    if completed.returncode and "--browser-channel" in command:
+        LOGGER.error(channel_error_message(browser))
+        with log_path.open("a", encoding="utf-8") as log_file:
+            log_file.write("\n\n=== CHANNEL HELP ===\n" + channel_error_message(browser) + "\n")
     LOGGER.info(
         "Browser %s finished with exit code %s. Log: %s",
         browser,
@@ -321,8 +349,18 @@ def _run_pytest_for_browser(
 def _write_browser_log(
     log_path: Path,
     command: list[str],
-    completed: subprocess.CompletedProcess,
+    completed: subprocess.CompletedProcess | None,
+    *,
+    preflight_message: str | None = None,
 ) -> None:
+    if preflight_message:
+        log_path.write_text(
+            "$ " + " ".join(command) + "\n\n=== PREFLIGHT FAILURE ===\n" + preflight_message + "\n",
+            encoding="utf-8",
+        )
+        return
+    if completed is None:
+        raise ValueError("completed is required when preflight_message is not provided")
     log_path.write_text(
         "$ "
         + " ".join(command)

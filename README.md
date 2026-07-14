@@ -165,13 +165,13 @@ python framework.py run --headed --browser chromium
 Run a browser matrix:
 
 ```bash
-python framework.py run --browsers chromium firefox webkit
+python framework.py run --browsers chromium firefox webkit chrome safari
 ```
 
 Run browsers in parallel and tests in parallel inside each browser:
 
 ```bash
-python framework.py run --browsers chromium firefox webkit --browser-workers 3 --parallel 2
+python framework.py run --browsers chromium firefox webkit chrome safari --browser-workers 3 --parallel 2
 ```
 
 Open the latest report:
@@ -267,9 +267,12 @@ Run a specific browser:
 
 ```bash
 python framework.py run --browser chromium
+python framework.py run --browser chrome
+python framework.py run --browser safari
 pytest --browser chromium
 pytest --browser firefox
 pytest --browser webkit
+pytest --browser chromium --browser-channel chrome
 ```
 
 Run the browser matrix from `config/settings.yaml`:
@@ -282,8 +285,8 @@ python scripts/run_browser_matrix.py
 Run a selected browser matrix:
 
 ```bash
-python framework.py run --browsers chromium firefox
-python scripts/run_browser_matrix.py --browsers chromium firefox
+python framework.py run --browsers chromium chrome safari
+python scripts/run_browser_matrix.py --browsers chromium chrome safari
 ```
 
 Run smoke tests in headed Chromium:
@@ -333,7 +336,7 @@ pytest -m helpers --no-generate-report
 | --- | --- | --- |
 | `--env` | `pytest --env qa` | Select an environment from `config/environments.yaml` |
 | `--base-url` | `pytest --base-url https://www.saucedemo.com/` | Override the environment base URL |
-| `--browser` | `pytest --browser chromium` | Select `chromium`, `firefox`, or `webkit` |
+| `--browser` | `pytest --browser chromium` | Select Playwright engines: `chromium`, `firefox`, or `webkit` |
 | `--headed` | `pytest --headed` | Run with visible browser UI |
 | `-m` | `pytest -m smoke` | Select tests by marker |
 | `-n` | `pytest -n 2` | Run tests in parallel with pytest-xdist |
@@ -357,8 +360,8 @@ pytest -m helpers --no-generate-report
 | `run --e2e` | `python framework.py run --e2e` | Run e2e tests |
 | `run --negative` | `python framework.py run --negative` | Run negative tests |
 | `run --helpers` | `python framework.py run --helpers --no-generate-report` | Run helper simulation/unit tests |
-| `run --browser` | `python framework.py run --browser chromium` | Run a normal pytest session in one browser |
-| `run --browsers` | `python framework.py run --browsers chromium firefox` | Run browser matrix execution |
+| `run --browser` | `python framework.py run --browser chrome` | Run a normal pytest session in one browser |
+| `run --browsers` | `python framework.py run --browsers chromium chrome safari` | Run browser matrix execution |
 | `run --browser-workers` | `python framework.py run --browsers chromium firefox --browser-workers 2` | Run browser suites in parallel |
 | `run --parallel` | `python framework.py run --parallel 4` | Run test cases in parallel using pytest-xdist |
 | `run --markers` | `python framework.py run --markers "smoke and not flaky"` | Use a raw pytest marker expression |
@@ -382,10 +385,26 @@ python framework.py run --smoke -- --maxfail=1 -k valid_login
 
 The framework supports two cross-browser execution styles.
 
+Framework CLI browser names:
+
+| Name | Playwright runtime | Notes |
+| --- | --- | --- |
+| `chromium` | `--browser chromium` | Bundled Playwright Chromium browser. |
+| `firefox` | `--browser firefox` | Bundled Playwright Firefox browser. |
+| `webkit` | `--browser webkit` | Bundled Playwright WebKit browser. |
+| `chrome` | `--browser chromium --browser-channel chrome` | Real Google Chrome channel. Install with `python -m playwright install chrome` if missing. |
+| `msedge` | `--browser chromium --browser-channel msedge` | Real Microsoft Edge channel. Install with `python -m playwright install msedge` if missing. |
+| `safari` | `--browser webkit` | Safari-engine/WebKit coverage. Playwright does not launch `Safari.app` directly. |
+
+`chromium` is the bundled Playwright browser. `chrome` is the installed Google Chrome channel
+driven through Playwright. The framework uses Playwright `--browser-channel`; it does not call
+system browser CLIs directly.
+
 Pytest native multi-browser execution:
 
 ```bash
 pytest -m smoke --browser chromium --browser firefox --browser webkit
+pytest -m smoke --browser chromium --browser-channel chrome
 ```
 
 This runs all selected browsers in one pytest session and produces one combined report.
@@ -405,6 +424,9 @@ execution:
     - chromium
     - firefox
     - webkit
+    - chrome
+    - msedge
+    - safari
   browser_workers: 1
 ```
 
@@ -415,12 +437,21 @@ reports/browser-matrix/index.html                 # Main dashboard
 reports/browser-matrix/reports/chromium/          # Chromium drill-down report
 reports/browser-matrix/reports/firefox/           # Firefox drill-down report
 reports/browser-matrix/reports/webkit/            # WebKit drill-down report
+reports/browser-matrix/reports/chrome/            # Google Chrome channel drill-down report
+reports/browser-matrix/reports/msedge/            # Microsoft Edge channel drill-down report
+reports/browser-matrix/reports/safari/            # Safari-engine/WebKit drill-down report
 reports/browser-matrix/results/chromium/          # Chromium Allure results
 reports/browser-matrix/results/firefox/           # Firefox Allure results
 reports/browser-matrix/results/webkit/            # WebKit Allure results
+reports/browser-matrix/results/chrome/            # Google Chrome channel Allure results
+reports/browser-matrix/results/msedge/            # Microsoft Edge channel Allure results
+reports/browser-matrix/results/safari/            # Safari-engine/WebKit Allure results
 reports/browser-matrix/logs/chromium.log          # Chromium pytest output
 reports/browser-matrix/logs/firefox.log           # Firefox pytest output
 reports/browser-matrix/logs/webkit.log            # WebKit pytest output
+reports/browser-matrix/logs/chrome.log            # Google Chrome channel pytest output
+reports/browser-matrix/logs/msedge.log            # Microsoft Edge channel pytest output
+reports/browser-matrix/logs/safari.log            # Safari-engine/WebKit pytest output
 ```
 
 The main dashboard is the entry point. It shows:
@@ -449,7 +480,7 @@ Or override it from the command line:
 
 ```bash
 python scripts/run_browser_matrix.py --browser-workers 3
-python framework.py run --browsers chromium firefox webkit --browser-workers 3
+python framework.py run --browsers chromium firefox webkit chrome safari --browser-workers 3
 ```
 
 Select the matrix report kind:
@@ -478,7 +509,7 @@ Browser matrix options:
 
 | Option | Example | Purpose |
 | --- | --- | --- |
-| `--browsers` | `python scripts/run_browser_matrix.py --browsers chromium firefox` | Override configured browser list |
+| `--browsers` | `python scripts/run_browser_matrix.py --browsers chromium chrome safari` | Override configured browser list |
 | `--env` | `python scripts/run_browser_matrix.py --env qa` | Select environment |
 | `--base-url` | `python scripts/run_browser_matrix.py --base-url https://www.saucedemo.com/` | Override base URL for every browser run |
 | `-m`, `--markers` | `python scripts/run_browser_matrix.py -m smoke` | Run marker subset |
@@ -496,6 +527,9 @@ Examples:
 ```bash
 python scripts/run_browser_matrix.py -m smoke --no-open-report
 python framework.py run --browsers chromium firefox webkit --smoke --no-open-report
+python framework.py run --smoke --browser chrome --no-open-report
+python framework.py run --smoke --browser safari --no-open-report
+python scripts/run_browser_matrix.py --browsers chromium chrome safari -m smoke --no-open-report
 python scripts/run_browser_matrix.py --browsers chromium firefox -m regression -n 2 --reruns 2
 python framework.py run --browsers chromium firefox --regression --parallel 2 --reruns 2
 python scripts/run_browser_matrix.py --browsers chromium firefox webkit --browser-workers 3 -m smoke
