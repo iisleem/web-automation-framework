@@ -114,4 +114,3 @@ readable scenarios.
 | Generate core plus official Allure | `python framework.py report generate --report-kind both --no-open` |
 | Skip report opening | `--no-open-report` |
 | Skip report generation | `--no-generate-report` |
-
