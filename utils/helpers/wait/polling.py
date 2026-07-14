@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-import time
 from typing import TypeVar
+
+from automation_core.helpers.wait import wait_until as core_wait_until
 
 
 T = TypeVar("T")
@@ -14,13 +15,10 @@ def wait_until(
     interval_seconds: float = 1,
     failure_message: str = "Condition was not met before timeout.",
 ) -> T:
-    deadline = time.monotonic() + timeout_seconds
-    last_value = None
-
-    while time.monotonic() <= deadline:
-        last_value = condition()
-        if last_value:
-            return last_value
-        time.sleep(interval_seconds)
-
-    raise TimeoutError(f"{failure_message} Last value: {last_value!r}")
+    return core_wait_until(
+        condition,
+        timeout_seconds=timeout_seconds,
+        interval_seconds=interval_seconds,
+        failure_message=failure_message,
+        ignore_exceptions=False,
+    )

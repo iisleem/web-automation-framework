@@ -1,54 +1,14 @@
 from __future__ import annotations
 
 from pathlib import Path
-from shutil import rmtree
 
-from utils.helpers.wait import wait_until
-
-
-def wait_for_file(
-    directory: Path | str,
-    pattern: str = "*",
-    timeout_seconds: float = 30,
-    interval_seconds: float = 1,
-) -> Path:
-    directory_path = Path(directory)
-
-    return wait_until(
-        lambda: _latest_file(directory_path, pattern),
-        timeout_seconds=timeout_seconds,
-        interval_seconds=interval_seconds,
-        failure_message=f"File matching '{pattern}' was not found in {directory_path}",
-    )
-
-
-def assert_file_exists(path: Path | str) -> Path:
-    file_path = Path(path)
-    assert file_path.exists(), f"Expected file to exist: {file_path}"
-    assert file_path.is_file(), f"Expected path to be a file: {file_path}"
-    return file_path
-
-
-def assert_file_extension(path: Path | str, expected_extension: str) -> Path:
-    file_path = assert_file_exists(path)
-    normalized_extension = expected_extension if expected_extension.startswith(".") else f".{expected_extension}"
-    assert (
-        file_path.suffix == normalized_extension
-    ), f"Expected file extension {normalized_extension}, got {file_path.suffix}"
-    return file_path
+from automation_core.helpers.files import (
+    assert_file_exists as assert_file_exists,
+    assert_file_extension as assert_file_extension,
+    cleanup_directory as core_cleanup_directory,
+    wait_for_file as wait_for_file,
+)
 
 
 def cleanup_directory(path: Path | str) -> None:
-    directory = Path(path)
-    if directory.exists():
-        rmtree(directory)
-    directory.mkdir(parents=True, exist_ok=True)
-
-
-def _latest_file(directory: Path, pattern: str) -> Path | None:
-    if not directory.exists():
-        return None
-    files = [path for path in directory.glob(pattern) if path.is_file()]
-    if not files:
-        return None
-    return max(files, key=lambda path: path.stat().st_mtime)
+    core_cleanup_directory(path, recreate=True)

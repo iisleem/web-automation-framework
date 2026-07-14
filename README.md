@@ -60,7 +60,7 @@ web-automation-framework/
 │   ├── data_reader.py             # JSON data reader
 │   ├── helpers/                   # Reusable automation helper library
 │   ├── logger.py                  # Framework logger
-│   ├── report_generator.py        # Legacy summary and browser matrix dashboard helpers
+│   ├── report_generator.py        # Compatibility wrapper over automation-core report helpers
 │   ├── reporting.py               # Web adapter for automation-core reporting
 │   ├── self_healing.py            # Self-healing locator data model
 │   └── screenshot_helper.py       # Screenshot helper
@@ -757,7 +757,11 @@ python scripts/generate_allure_report.py --report-kind core
 
 ## Framework Helpers
 
-The framework includes reusable helpers for common automation tasks so engineers do not need to rebuild the same utilities in every project.
+The framework includes reusable helpers for common automation tasks so engineers do not need to
+rebuild the same utilities in every project. Environment-neutral helpers such as config, logging,
+data generation, files, polling, text extraction, date/time, secrets, cleanup, soft assertions, and
+report utilities are compatibility wrappers over `automation-core`; web-specific helpers remain in
+this repository.
 
 Helper documentation:
 

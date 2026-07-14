@@ -3,6 +3,12 @@ from __future__ import annotations
 import fnmatch
 from typing import Any
 
+from automation_core.helpers.performance import (
+    assert_response_time_under as assert_response_time_under,
+    get_elapsed_ms as get_elapsed_ms,
+    summarize_response_timings as summarize_response_timings,
+)
+
 
 def get_navigation_timing(page: Any) -> dict[str, float]:
     return page.evaluate(
