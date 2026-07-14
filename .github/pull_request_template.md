@@ -1,10 +1,10 @@
 ## What Changed
 
-- 
+- TODO
 
 ## Why
 
-- 
+- TODO
 
 ## Validation
 
@@ -24,4 +24,4 @@
 
 ## Notes
 
-- 
+- TODO
