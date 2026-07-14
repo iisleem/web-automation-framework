@@ -71,6 +71,8 @@ web-automation-framework/
 │   ├── FRAMEWORK_HELPERS.md       # Helper usage guide
 │   ├── FEATURE_PARITY.md          # Web baseline and cross-framework parity notes
 │   └── helpers_catalog.html       # Searchable helper catalog
+├── templates/
+│   └── starter_project/           # Copyable product suite starter
 ├── reports/                       # Allure results, automation reports, matrix reports, logs
 ├── screenshots/                   # Failure screenshots
 ├── videos/                        # Failure videos
@@ -85,6 +87,16 @@ web-automation-framework/
 ├── requirements.txt               # Python dependencies
 └── .gitignore
 ```
+
+## Starter Template
+
+This repository is marked as a GitHub template repository. Use it when starting a new
+product-specific web automation suite, then replace the SauceDemo example layers with the
+application pages, flows, data, and tests for your product.
+
+A small copyable starter is available under `templates/starter_project/`. It shows the expected
+shape for product-owned page objects, flows, tests, and environment configuration without copying
+framework internals.
 
 ## Quick Start
 
