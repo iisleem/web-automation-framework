@@ -3,6 +3,16 @@
 This walkthrough shows a practical first run using the bundled SauceDemo sample, the starter project
 layout, and the generated reports. The screenshots below were captured from a local Chromium run.
 
+## Screenshot Maintenance
+
+Walkthrough screenshots should come from real framework runs. Prefer Playwright runtime artifacts,
+core report pages, browser matrix reports, or screenshots written by tests. Do not use the system
+Google Chrome CLI, such as `/Applications/Google Chrome.app/... --headless`, as the primary capture
+path for documentation images because it can fail on macOS depending on GUI and sandbox behavior.
+
+This guidance does not change `utils/screenshot_helper.py` or visual helpers. They use Playwright
+screenshots, which remain the supported runtime path.
+
 ## 1. Set Up The Project
 
 ```bash
