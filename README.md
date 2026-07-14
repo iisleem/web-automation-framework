@@ -70,6 +70,8 @@ web-automation-framework/
 ├── docs/
 │   ├── FRAMEWORK_HELPERS.md       # Helper usage guide
 │   ├── FEATURE_PARITY.md          # Web baseline and cross-framework parity notes
+│   ├── WALKTHROUGH.md             # First-run walkthrough with local report screenshots
+│   ├── assets/walkthrough/        # Walkthrough screenshots captured from sample runs
 │   └── helpers_catalog.html       # Searchable helper catalog
 ├── templates/
 │   └── starter_project/           # Copyable product suite starter
@@ -97,6 +99,9 @@ application pages, flows, data, and tests for your product.
 A small copyable starter is available under `templates/starter_project/`. It shows the expected
 shape for product-owned page objects, flows, tests, and environment configuration without copying
 framework internals.
+
+For a first-run guide with screenshots from the sample reports, see
+[Web Framework Walkthrough](docs/WALKTHROUGH.md).
 
 ## Quick Start
 
@@ -725,6 +730,7 @@ Helper documentation:
 - [Framework Helpers Guide](docs/FRAMEWORK_HELPERS.md)
 - [Searchable Helpers Catalog](docs/helpers_catalog.html)
 - [Feature Parity Notes](docs/FEATURE_PARITY.md)
+- [Web Framework Walkthrough](docs/WALKTHROUGH.md)
 
 Open the searchable catalog from the CLI:
 
