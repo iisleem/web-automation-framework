@@ -48,7 +48,7 @@ flow calls `automation_core.reporting.finalize_allure_reporting(...)` through th
 | Area | Direction |
 | --- | --- |
 | Product report models and generation | Owned by `automation-core`; web passes serializable web metadata through `utils/reporting.py`. |
-| Neutral config, logging, artifacts, polling, text, data, file, env, cleanup, and soft assertion concepts | Keep in or migrate to `automation-core` when reused across web, mobile, and API. |
+| Neutral config, logging, reporting utilities, polling, text, data, file, env, cleanup, and soft assertion concepts | Web keeps compatibility import paths while delegating shared behavior to `automation-core`. |
 | Framework-specific adapters | Stay in this repo when they depend on Playwright or browser concepts. |
 
 ## Self-Healing And Auto-Healing

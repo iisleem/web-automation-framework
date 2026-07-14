@@ -2,16 +2,21 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from contextlib import contextmanager
-import json
 from pathlib import Path
 from typing import Any
 
 import allure
+from automation_core.reporting.allure_debug import (
+    attach_file as core_attach_file,
+    attach_json as core_attach_json,
+    attach_text as core_attach_text,
+    step as core_step,
+)
 
 
 @contextmanager
 def step(title: str) -> Iterator[None]:
-    with allure.step(title):
+    with core_step(title, allure_api=allure):
         yield
 
 
@@ -21,11 +26,7 @@ def attach_text(
     *,
     allure_api: Any = allure,
 ) -> None:
-    allure_api.attach(
-        content,
-        name=name,
-        attachment_type=allure_api.attachment_type.TEXT,
-    )
+    core_attach_text(content, name=name, allure_api=allure_api)
 
 
 def attach_json(
@@ -35,11 +36,7 @@ def attach_json(
     indent: int = 2,
     allure_api: Any = allure,
 ) -> None:
-    allure_api.attach(
-        json.dumps(data, indent=indent, ensure_ascii=False),
-        name=name,
-        attachment_type=allure_api.attachment_type.JSON,
-    )
+    core_attach_json(data, name=name, indent=indent, allure_api=allure_api)
 
 
 def attach_file(
@@ -50,17 +47,13 @@ def attach_file(
     extension: str | None = None,
     allure_api: Any = allure,
 ) -> Path:
-    file_path = Path(path)
-    assert file_path.exists(), f"Attachment file does not exist: {file_path}"
-    assert file_path.is_file(), f"Attachment path is not a file: {file_path}"
-
-    allure_api.attach.file(
-        str(file_path),
-        name=name or file_path.name,
+    return core_attach_file(
+        path,
+        name=name,
         attachment_type=attachment_type,
         extension=extension,
+        allure_api=allure_api,
     )
-    return file_path
 
 
 def attach_page_url(
