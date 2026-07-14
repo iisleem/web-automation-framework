@@ -12,7 +12,13 @@ from utils.allure_cli import get_or_install_allure_cli
 from utils.config_reader import ConfigReader
 from utils.logger import get_logger
 from utils.report_opener import open_report
-from utils.report_generator import generate_html_report
+from utils.reporting import (
+    VALID_REPORT_KINDS,
+    build_web_report_metadata,
+    configured_report_kind,
+    finalize_web_report,
+    primary_report_path,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -83,6 +89,11 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--reruns", help="Retry failed tests.")
     run_parser.add_argument("--reruns-delay", help="Delay between retries.")
     run_parser.add_argument("--run-reporting-demo", action="store_true", help="Include the intentionally failing reporting demo.")
+    run_parser.add_argument(
+        "--report-kind",
+        choices=VALID_REPORT_KINDS,
+        help="Post-run report kind: core, allure, both, or summary. Defaults to config/settings.yaml.",
+    )
     run_parser.add_argument("--no-open-report", action="store_true", help="Do not open generated reports.")
     run_parser.add_argument("--no-generate-report", action="store_true", help="Do not generate a post-run report.")
     run_parser.add_argument("--matrix", action="store_true", help="Force browser matrix execution.")
@@ -92,13 +103,29 @@ def _build_parser() -> argparse.ArgumentParser:
     report_open = report_subparsers.add_parser("open", help="Open the latest generated report.")
     report_open.add_argument(
         "--type",
-        choices=("auto", "matrix", "allure"),
+        choices=("auto", "matrix", "core", "allure", "summary"),
         default="auto",
         help="Report type to open.",
     )
     report_generate = report_subparsers.add_parser("generate", help="Generate a report from Allure results.")
     report_generate.add_argument("--results", default="reports/allure-results", help="Allure results directory.")
-    report_generate.add_argument("--output", default="reports/allure-report", help="Report output directory.")
+    report_generate.add_argument(
+        "--output",
+        help="Primary report output directory. Defaults to config/settings.yaml for the selected report kind.",
+    )
+    report_generate.add_argument(
+        "--allure-output",
+        help="Official Allure output directory when --report-kind is allure or both.",
+    )
+    report_generate.add_argument(
+        "--summary-output",
+        help="Summary report output directory when --report-kind is summary.",
+    )
+    report_generate.add_argument(
+        "--report-kind",
+        choices=VALID_REPORT_KINDS,
+        help="Report kind to generate: core, allure, both, or summary. Defaults to config/settings.yaml.",
+    )
     report_generate.add_argument("--no-open", action="store_true", help="Generate without opening the report.")
 
     helpers_parser = subparsers.add_parser("helpers", help="Open helper documentation.")
@@ -157,6 +184,8 @@ def _run_tests(args: argparse.Namespace, extra_pytest_args: list[str]) -> int:
             command.append("--no-open-report")
         if args.no_generate_report:
             command.append("--no-generate-report")
+        if args.report_kind:
+            command.extend(["--report-kind", args.report_kind])
         command.extend(_normalize_passthrough_args(extra_pytest_args))
         return _run_command(command)
 
@@ -181,6 +210,8 @@ def _run_tests(args: argparse.Namespace, extra_pytest_args: list[str]) -> int:
         command.append("--no-open-report")
     if args.no_generate_report:
         command.append("--no-generate-report")
+    if args.report_kind:
+        command.extend(["--report-kind", args.report_kind])
     command.extend(_normalize_passthrough_args(extra_pytest_args))
 
     return _run_command(command)
@@ -234,8 +265,24 @@ def _handle_report_command(args: argparse.Namespace) -> int:
         return 0 if _open_path(report_path) else 1
 
     results_dir = (PROJECT_ROOT / args.results).resolve()
-    output_dir = (PROJECT_ROOT / args.output).resolve()
-    report_path = _generate_report(results_dir, output_dir)
+    output_dir = (PROJECT_ROOT / args.output).resolve() if args.output else None
+    allure_output_dir = (
+        (PROJECT_ROOT / args.allure_output).resolve() if args.allure_output else None
+    )
+    summary_output_dir = (
+        (PROJECT_ROOT / args.summary_output).resolve() if args.summary_output else None
+    )
+    result = _generate_report(
+        results_dir,
+        report_kind=args.report_kind,
+        output_dir=output_dir,
+        allure_output_dir=allure_output_dir,
+        summary_output_dir=summary_output_dir,
+    )
+    report_path = primary_report_path(result)
+    if not report_path:
+        print("Report generation did not produce an index.html. Check logs for details.")
+        return 1
     print(f"Generated report: {report_path}")
     if not args.no_open:
         _open_path(report_path)
@@ -246,6 +293,10 @@ def _find_report(report_type: str) -> Path | None:
     candidates: list[Path] = []
     if report_type in {"auto", "matrix"}:
         candidates.append(PROJECT_ROOT / "reports" / "browser-matrix" / "index.html")
+    if report_type in {"auto", "core"}:
+        candidates.append(PROJECT_ROOT / "reports" / "automation-report" / "index.html")
+    if report_type in {"auto", "summary"}:
+        candidates.append(PROJECT_ROOT / "reports" / "summary-report" / "index.html")
     if report_type in {"auto", "allure"}:
         candidates.append(PROJECT_ROOT / "reports" / "allure-report" / "index.html")
 
@@ -255,28 +306,26 @@ def _find_report(report_type: str) -> Path | None:
     return max(existing, key=lambda path: path.stat().st_mtime)
 
 
-def _generate_report(results_dir: Path, output_dir: Path) -> Path:
-    allure_executable = get_or_install_allure_cli(PROJECT_ROOT, LOGGER)
-    if allure_executable:
-        try:
-            subprocess.run(
-                [
-                    allure_executable,
-                    "generate",
-                    str(results_dir),
-                    "-o",
-                    str(output_dir),
-                    "--clean",
-                ],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-            return output_dir / "index.html"
-        except Exception as error:
-            LOGGER.warning("Official Allure generation failed. Falling back: %s", error)
-
-    return generate_html_report(results_dir, output_dir)
+def _generate_report(
+    results_dir: Path,
+    *,
+    report_kind: str | None = None,
+    output_dir: Path | None = None,
+    allure_output_dir: Path | None = None,
+    summary_output_dir: Path | None = None,
+):
+    kind = configured_report_kind(PROJECT_ROOT, report_kind)
+    metadata = build_web_report_metadata(PROJECT_ROOT)
+    return finalize_web_report(
+        project_root=PROJECT_ROOT,
+        results_dir=results_dir,
+        report_kind=kind,
+        output_dir=output_dir,
+        allure_output_dir=allure_output_dir,
+        summary_output_dir=summary_output_dir,
+        metadata=metadata,
+        logger=LOGGER,
+    )
 
 
 def _open_helpers_catalog(args: argparse.Namespace) -> int:
@@ -415,13 +464,13 @@ def _check_allure(doctor: Doctor, install: bool) -> None:
         if executable:
             doctor.pass_(f"Local Allure CLI is installed: {executable}")
         else:
-            doctor.warn("Allure CLI is unavailable. Built-in HTML report fallback will be used.")
+            doctor.warn("Allure CLI is unavailable. Core report generation still works.")
         return
     local_allure = PROJECT_ROOT / ".tools" / "allure"
     if local_allure.exists():
         doctor.pass_("Local Allure CLI cache exists under .tools/allure")
     else:
-        doctor.warn("Allure CLI is not on PATH. It will be auto-installed or the built-in fallback report will be used.")
+        doctor.warn("Allure CLI is not on PATH. Required only for --report-kind allure or both.")
 
 
 def _check_artifact_directories(doctor: Doctor) -> None:

@@ -11,15 +11,20 @@ import sys
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from utils.allure_cli import get_or_install_allure_cli
 from utils.config_reader import ConfigReader
 from utils.logger import get_logger
 from utils.report_opener import open_report
 from utils.report_generator import (
     generate_browser_matrix_dashboard,
-    generate_html_report,
     read_allure_results,
     summarize_results,
+)
+from utils.reporting import (
+    VALID_REPORT_KINDS,
+    build_web_report_metadata,
+    configured_report_kind,
+    finalize_web_report,
+    primary_report_path,
 )
 
 
@@ -70,7 +75,7 @@ def main() -> int:
     if args.no_generate_report:
         return max((pytest_run["exit_code"] for pytest_run in pytest_runs), default=0)
 
-    allure_executable = get_or_install_allure_cli(PROJECT_ROOT, LOGGER)
+    report_kind = configured_report_kind(PROJECT_ROOT, args.report_kind)
 
     for pytest_run in pytest_runs:
         browser = pytest_run["browser"]
@@ -80,9 +85,11 @@ def main() -> int:
         exit_code = max(exit_code, browser_exit_code)
 
         report_path = _generate_browser_report(
-            allure_executable,
             results_dir,
             report_dir,
+            report_kind=report_kind,
+            browser=browser,
+            env_name=args.env,
         )
         tests = read_allure_results(results_dir)
         summary = summarize_results(tests)
@@ -95,7 +102,7 @@ def main() -> int:
                 "exit_code": browser_exit_code,
                 "summary": summary,
                 "report_path": report_path,
-                "report_href": f"reports/{browser}/index.html",
+                "report_href": _relative_href(matrix_dir, report_path),
                 "log_href": f"logs/{browser}.log",
             }
         )
@@ -144,6 +151,11 @@ def _parse_args() -> tuple[argparse.Namespace, list[str]]:
         "--no-generate-report",
         action="store_true",
         help="Run pytest per browser without generating browser reports or the matrix dashboard.",
+    )
+    parser.add_argument(
+        "--report-kind",
+        choices=VALID_REPORT_KINDS,
+        help="Per-browser report kind: core, allure, both, or summary. Defaults to config/settings.yaml.",
     )
     return parser.parse_known_args()
 
@@ -325,34 +337,54 @@ def _write_browser_log(
 
 
 def _generate_browser_report(
-    allure_executable: str | None,
     results_dir: Path,
     report_dir: Path,
+    *,
+    report_kind: str,
+    browser: str,
+    env_name: str,
 ) -> Path:
-    if allure_executable:
-        try:
-            subprocess.run(
-                [
-                    allure_executable,
-                    "generate",
-                    str(results_dir),
-                    "-o",
-                    str(report_dir),
-                    "--clean",
-                ],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-            return report_dir / "index.html"
-        except Exception as error:
-            LOGGER.warning("Official Allure generation failed. Falling back: %s", error)
+    framework_config = _load_framework_config(env_name)
+    metadata = build_web_report_metadata(
+        PROJECT_ROOT,
+        framework_config=framework_config,
+        browser=browser,
+        extra={"browser_matrix": True},
+    )
+    result = finalize_web_report(
+        project_root=PROJECT_ROOT,
+        results_dir=results_dir,
+        report_kind=report_kind,
+        output_dir=report_dir,
+        allure_output_dir=report_dir / "allure",
+        summary_output_dir=report_dir,
+        metadata=metadata,
+        logger=LOGGER,
+    )
+    report_path = primary_report_path(result)
+    if report_path:
+        return report_path
+    LOGGER.warning("No browser report was generated for %s; dashboard will link to the expected path.", browser)
+    return report_dir / "index.html"
 
-    return generate_html_report(results_dir, report_dir)
+
+def _load_framework_config(env_name: str) -> dict:
+    try:
+        return ConfigReader(PROJECT_ROOT).load(env_name)
+    except Exception as error:
+        LOGGER.warning("Could not load framework metadata for browser matrix report: %s", error)
+        return {}
 
 
 def _open_report_if_local(report_path: Path) -> None:
     open_report(report_path, LOGGER)
+
+
+def _relative_href(root: Path, path: Path) -> str:
+    try:
+        return path.relative_to(root).as_posix()
+    except ValueError:
+        return path.as_posix()
 
 
 if __name__ == "__main__":

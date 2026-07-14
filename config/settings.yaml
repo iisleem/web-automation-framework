@@ -24,6 +24,12 @@ artifacts:
   traces_dir: traces
   allure_results_dir: reports/allure-results
 
+reporting:
+  report_kind: core
+  core_report_dir: reports/automation-report
+  allure_report_dir: reports/allure-report
+  summary_report_dir: reports/summary-report
+
 retries:
   default: 1
 
