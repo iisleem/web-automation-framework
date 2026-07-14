@@ -3,6 +3,10 @@
 Use this folder as the first product-specific layer after creating a repository from the web
 automation framework template.
 
+This starter follows the shared
+[Automation Framework Template Strategy](https://github.com/iisleem/automation-core/blob/main/docs/template_strategy.md)
+for keeping framework internals separate from product-owned suite code.
+
 Recommended first steps:
 
 1. Copy the starter folders into the repository root or use them as a reference.

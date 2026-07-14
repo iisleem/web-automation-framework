@@ -100,6 +100,9 @@ A small copyable starter is available under `templates/starter_project/`. It sho
 shape for product-owned page objects, flows, tests, and environment configuration without copying
 framework internals.
 
+For the shared family guidance behind this layout, see
+[Automation Framework Template Strategy](https://github.com/iisleem/automation-core/blob/main/docs/template_strategy.md).
+
 For a first-run guide with screenshots from the sample reports, see
 [Web Framework Walkthrough](docs/WALKTHROUGH.md).
 
