@@ -69,6 +69,7 @@ web-automation-framework/
 │   └── run_browser_matrix.py      # Browser matrix runner and dashboard builder
 ├── docs/
 │   ├── FRAMEWORK_HELPERS.md       # Helper usage guide
+│   ├── FEATURE_PARITY.md          # Web baseline and cross-framework parity notes
 │   └── helpers_catalog.html       # Searchable helper catalog
 ├── reports/                       # Allure results, automation reports, matrix reports, logs
 ├── screenshots/                   # Failure screenshots
@@ -76,8 +77,10 @@ web-automation-framework/
 ├── traces/                        # Failure Playwright traces
 ├── .github/workflows/
 │   └── playwright-tests.yml       # GitHub Actions pipeline
+├── .env.example                   # Safe optional environment variable placeholders
 ├── conftest.py                    # Pytest hooks and fixtures
 ├── framework.py                   # Unified framework CLI
+├── pyproject.toml                 # Ruff lint configuration
 ├── pytest.ini                     # Pytest config, markers, Allure results path
 ├── requirements.txt               # Python dependencies
 └── .gitignore
@@ -94,6 +97,12 @@ pip install -r requirements.txt
 playwright install
 python framework.py doctor
 python framework.py run
+```
+
+Optional integrations such as email OTP helpers use environment variables. Start from the safe placeholder file when needed:
+
+```bash
+cp .env.example .env
 ```
 
 On Linux CI or a fresh Linux machine, install browser system dependencies:
@@ -703,6 +712,7 @@ Helper documentation:
 
 - [Framework Helpers Guide](docs/FRAMEWORK_HELPERS.md)
 - [Searchable Helpers Catalog](docs/helpers_catalog.html)
+- [Feature Parity Notes](docs/FEATURE_PARITY.md)
 
 Open the searchable catalog from the CLI:
 
@@ -970,10 +980,11 @@ The pipeline:
 2. Sets up Python 3.12.
 3. Installs dependencies from `requirements.txt`.
 4. Installs Playwright browsers with system dependencies.
-5. Runs the browser matrix runner in parallel with Chromium.
-6. Skips the intentional reporting demo by default.
-7. Generates the browser matrix dashboard and browser drill-down report.
-8. Uploads reports, screenshots, videos, and traces as artifacts.
+5. Runs `ruff check .` for syntax/import lint coverage.
+6. Runs the browser matrix runner in parallel with Chromium.
+7. Skips the intentional reporting demo by default.
+8. Generates the browser matrix dashboard and browser drill-down report.
+9. Uploads reports, screenshots, videos, and traces as artifacts.
 
 ## Troubleshooting
 
