@@ -5,6 +5,7 @@ from playwright.sync_api import Error, Locator, Page, TimeoutError, expect
 
 from utils.config_reader import ConfigReader
 from utils.logger import get_logger
+from utils.runtime_healing import attempt_runtime_healing, runtime_healing_settings
 from utils.self_healing import LocatorCandidate
 
 
@@ -52,6 +53,7 @@ class BasePage:
         self.page = page
         self._settings = ConfigReader(self.project_path()).read_settings()
         self._self_healing_config = self._settings.get("self_healing", {})
+        self._runtime_healing = runtime_healing_settings(self._settings, self.project_path())
 
     def goto(self, url: str) -> None:
         with allure.step(f"Open URL: {url}"):
@@ -59,23 +61,48 @@ class BasePage:
 
     def click(self, locator: Locator | HealingLocator, description: str) -> None:
         with allure.step(f"Click {description}"):
-            self.resolve(locator).click()
+            self._run_locator_action(
+                locator,
+                description,
+                "click",
+                lambda resolved: resolved.click(),
+            )
 
     def fill(self, locator: Locator | HealingLocator, value: str, description: str) -> None:
         with allure.step(f"Fill {description}"):
-            self.resolve(locator).fill(value)
+            self._run_locator_action(
+                locator,
+                description,
+                "fill",
+                lambda resolved: resolved.fill(value),
+            )
 
     def text(self, locator: Locator | HealingLocator, description: str) -> str:
         with allure.step(f"Read text from {description}"):
-            return self.resolve(locator).inner_text()
+            return self._run_locator_action(
+                locator,
+                description,
+                "text",
+                lambda resolved: resolved.inner_text(),
+            )
 
     def select(self, locator: Locator | HealingLocator, value: str, description: str) -> None:
         with allure.step(f"Select {description}: {value}"):
-            self.resolve(locator).select_option(value)
+            self._run_locator_action(
+                locator,
+                description,
+                "select",
+                lambda resolved: resolved.select_option(value),
+            )
 
     def expect_visible(self, locator: Locator | HealingLocator, description: str) -> None:
         with allure.step(f"Verify {description} is visible"):
-            expect(self.resolve(locator)).to_be_visible()
+            self._run_locator_action(
+                locator,
+                description,
+                "expect_visible",
+                lambda resolved: expect(resolved).to_be_visible(),
+            )
 
     def locator(self, selector: str, description: str) -> Locator:
         return self.page.locator(selector)
@@ -107,6 +134,28 @@ class BasePage:
         if isinstance(locator, HealingLocator):
             return locator.resolve()
         return locator
+
+    def _run_locator_action(
+        self,
+        locator: Locator | HealingLocator,
+        description: str,
+        action: str,
+        runner,
+    ):
+        try:
+            return runner(self.resolve(locator))
+        except Exception as error:
+            if not isinstance(locator, HealingLocator):
+                raise
+            return attempt_runtime_healing(
+                page=self.page,
+                description=description,
+                primary=locator.candidates[0],
+                action=action,
+                action_runner=runner,
+                settings=self._runtime_healing,
+                original_error=error,
+            )
 
     def _resolve_locator(
         self,

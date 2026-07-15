@@ -958,3 +958,13 @@ assert_column_sorted(rows[1:], column_index=0)
 - Document every new helper in this file.
 - Add a simple example for each helper.
 - Keep business-domain helpers separate from low-level utilities when the library grows.
+
+## Runtime Auto-Healing Notes
+
+Runtime auto-healing is configured in `config/settings.yaml` under `runtime_healing` and is disabled
+by default. Use `suggest` mode to collect audit events without applying candidates. Use `apply` only
+for suites where locator recovery has been reviewed and the candidate signals are stable enough for
+the product.
+
+Healing events are written to `reports/healing/events.jsonl` and are included in the core product
+report when available.

@@ -15,6 +15,7 @@ when it is environment-neutral; browser-specific behavior stays in this reposito
 | SauceDemo sample | Supported | Smoke, regression, and e2e tests demonstrate login, cart, sorting, checkout, negative validation, and reporting artifacts. |
 | Browser selection | Supported | Chromium, Firefox, WebKit, Google Chrome channel, Microsoft Edge channel, and Safari-engine/WebKit aliases are supported through Playwright. |
 | Browser matrix | Supported | `scripts/run_browser_matrix.py` runs one suite per browser and builds `reports/browser-matrix/index.html`. |
+| Runtime auto-healing | Supported | Disabled by default; web discovers Playwright candidates and automation-core evaluates decisions. |
 | Reports | Supported | Core product report is the default at `reports/automation-report/index.html`. |
 | Official Allure | Optional | Use `--report-kind allure` or `--report-kind both` when official Allure HTML is needed. |
 | Failure artifacts | Supported | Failed tests capture screenshots, Playwright traces, videos, and Allure attachments. |
@@ -54,10 +55,12 @@ flow calls `automation_core.reporting.finalize_allure_reporting(...)` through th
 ## Self-Healing And Auto-Healing
 
 Conservative self-healing currently means engineer-defined primary locators with ordered fallback
-selectors in page objects. The framework does not invent new locators at runtime.
+selectors in page objects.
 
-Per the family ownership rules, broader auto-healing is deferred until it is explicitly scoped for
-both web and mobile. Do not add partial or silent auto-healing behavior in this repository.
+Runtime auto-healing is supported through the web adapter and `automation-core` healing models. It is
+disabled by default. `suggest` mode records ranked candidates only, while `apply` mode can use a
+candidate after core approval and web safety checks. Candidate discovery stays in web because it
+depends on Playwright pages and browser DOM signals.
 
 ## Maintainer Rule
 

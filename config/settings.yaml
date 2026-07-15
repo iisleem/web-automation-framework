@@ -37,6 +37,21 @@ self_healing:
   enabled: true
   timeout_ms: 1500
 
+runtime_healing:
+  mode: disabled
+  min_score: 0.78
+  ambiguity_delta: 0.05
+  max_candidates: 10
+  allowed_actions:
+    - click
+    - fill
+    - select
+    - text
+    - expect_visible
+  allow_patterns: []
+  deny_patterns: []
+  audit_path: reports/healing/events.jsonl
+
 email:
   provider: imap
   host: imap.gmail.com

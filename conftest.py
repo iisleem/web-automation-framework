@@ -18,6 +18,7 @@ from utils.reporting import (
     finalize_web_report,
     primary_report_path,
 )
+from utils.runtime_healing import DEFAULT_AUDIT_PATH
 from utils.screenshot_helper import capture_screenshot
 
 
@@ -61,9 +62,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
 
 
-def pytest_configure() -> None:
+def pytest_configure(config: pytest.Config) -> None:
     for directory in ARTIFACT_DIRECTORIES:
         (PROJECT_ROOT / directory).mkdir(parents=True, exist_ok=True)
+    if not hasattr(config, "workerinput"):
+        _prepare_healing_audit()
 
 
 def pytest_collection_modifyitems(
@@ -201,6 +204,17 @@ def email_otp_helper(
 
 def _safe_artifact_name(nodeid: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]+", "_", nodeid).strip("_")
+
+
+def _prepare_healing_audit() -> None:
+    try:
+        settings = ConfigReader(PROJECT_ROOT).read_settings()
+        audit_path = PROJECT_ROOT / settings.get("runtime_healing", {}).get("audit_path", DEFAULT_AUDIT_PATH)
+        audit_path.parent.mkdir(parents=True, exist_ok=True)
+        if audit_path.exists():
+            audit_path.unlink()
+    except OSError as error:
+        LOGGER.warning("Could not prepare runtime healing audit file: %s", error)
 
 
 def _capture_and_attach_screenshot(
