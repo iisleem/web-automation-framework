@@ -16,7 +16,7 @@ when it is environment-neutral; browser-specific behavior stays in this reposito
 | Browser selection | Supported | Chromium, Firefox, WebKit, Google Chrome channel, Microsoft Edge channel, and Safari-engine/WebKit aliases are supported through Playwright. |
 | Browser matrix | Supported | `scripts/run_browser_matrix.py` runs one suite per browser and builds `reports/browser-matrix/index.html`. |
 | Runtime auto-healing | Supported | Disabled by default; web discovers Playwright candidates and automation-core evaluates decisions. |
-| Reports | Supported | Core product report is the default at `reports/automation-report/index.html`. |
+| Reports | Supported | Core product report is the default at `reports/automation-report/index.html` with `report-data.json` sidecar data. |
 | Official Allure | Optional | Use `--report-kind allure` or `--report-kind both` when official Allure HTML is needed. |
 | Failure artifacts | Supported | Failed tests capture screenshots, Playwright traces, videos, and Allure attachments. |
 | Helper catalog | Supported | `docs/FRAMEWORK_HELPERS.md` and `docs/helpers_catalog.html` document reusable web automation helpers. |
@@ -30,7 +30,7 @@ flow calls `automation_core.reporting.finalize_allure_reporting(...)` through th
 
 | Report kind | Primary output | Notes |
 | --- | --- | --- |
-| `core` | `reports/automation-report/index.html` | Default and recommended product report. |
+| `core` | `reports/automation-report/index.html` plus `report-data.json` | Default and recommended product report. |
 | `allure` | `reports/allure-report/index.html` | Official Allure report only. |
 | `both` | Core report plus official Allure output | Core remains primary; official Allure failures are warnings when core succeeds. |
 | `summary` | `reports/summary-report/index.html` | Lightweight HTML summary. |

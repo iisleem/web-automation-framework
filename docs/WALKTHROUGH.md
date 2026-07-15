@@ -45,10 +45,11 @@ Expected result:
 ```text
 3 passed
 reports/automation-report/index.html
+reports/automation-report/report-data.json
 ```
 
 The report dashboard summarizes the run, pass rate, slowest tests, failure summary, and drill-down
-links.
+links. The JSON sidecar stores the same generated report data for tooling or inspection.
 
 ![Core report dashboard](assets/walkthrough/core-report-dashboard.png)
 

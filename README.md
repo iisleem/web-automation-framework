@@ -568,15 +568,17 @@ At the end of the test session, the framework automatically generates:
 
 ```text
 reports/automation-report/index.html
+reports/automation-report/report-data.json
 ```
 
-This is the default automation-core product report and it is the report opened locally after a run.
+This is the default automation-core product report. `index.html` is opened locally after a run, and
+`report-data.json` stores the report data used by the dashboard.
 
 Report generation flow:
 
 1. Pytest writes raw Allure result files to `reports/allure-results/`.
 2. The web adapter calls `automation_core.reporting.finalize_allure_reporting(...)`.
-3. By default, `report_kind=core` generates `reports/automation-report/index.html`.
+3. By default, `report_kind=core` generates `reports/automation-report/index.html` and `reports/automation-report/report-data.json`.
 4. If the run is local, the framework opens the core report in the default browser.
 5. If the run is in CI/server mode or browser opening fails, the framework logs a note and does not fail a successful test run.
 
@@ -584,7 +586,7 @@ Supported report kinds:
 
 | Kind | Output | Purpose |
 | --- | --- | --- |
-| `core` | `reports/automation-report/index.html` | Default product report and recommended local/CI artifact |
+| `core` | `reports/automation-report/index.html` plus `report-data.json` | Default product report and recommended local/CI artifact |
 | `allure` | `reports/allure-report/index.html` | Official Allure HTML report only |
 | `both` | Core report plus official Allure report | Recommended when a team wants the product dashboard and Allure drill-downs |
 | `summary` | `reports/summary-report/index.html` | Lightweight summary report |
