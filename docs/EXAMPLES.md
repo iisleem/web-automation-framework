@@ -28,7 +28,8 @@ Generated report outputs:
 
 ```text
 reports/automation-report/index.html
-reports/automation-report/report-data.json
+reports/automation-report/reports.html
+reports/automation-report/runs/<timestamp>-<run-id>/report-data.json
 ```
 
 ## Included Recipes

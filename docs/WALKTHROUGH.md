@@ -47,11 +47,13 @@ Expected result:
 ```text
 3 passed
 reports/automation-report/index.html
-reports/automation-report/report-data.json
+reports/automation-report/reports.html
+reports/automation-report/runs/<timestamp>-<run-id>/report-data.json
 ```
 
-The report dashboard summarizes the run, pass rate, slowest tests, failure summary, and drill-down
-links. The JSON sidecar stores the same generated report data for tooling or inspection.
+The portfolio dashboard summarizes retained runs, pass rate, slowest tests, failure summary, and
+drill-down links. The report gallery lets you pick a specific run, and each timestamped run folder
+stores the generated report data for tooling or inspection.
 
 ![Core report dashboard](assets/walkthrough/core-report-dashboard.png)
 

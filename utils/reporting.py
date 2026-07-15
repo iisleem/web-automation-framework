@@ -186,6 +186,8 @@ def _log_reporting_result(result, logger) -> None:
     report_path = primary_report_path(result)
     if report_path:
         logger.info("Generated %s report: %s", result.report_kind, report_path)
+    if result.core.generated and getattr(result.core, "run_path", None):
+        logger.info("Generated latest run details: %s", result.core.run_path)
     for warning in result.warnings:
         logger.warning(warning)
     for error in result.errors:
