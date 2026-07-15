@@ -41,6 +41,30 @@ def test_finalize_web_report_uses_core_default_paths(tmp_path, monkeypatch):
     assert reporting.primary_report_path(result) == tmp_path / "reports" / "automation-report" / "index.html"
 
 
+def test_finalize_web_report_passes_core_report_enrichers(tmp_path, monkeypatch):
+    _write_settings(tmp_path)
+    results_dir = tmp_path / "reports" / "allure-results"
+    results_dir.mkdir(parents=True)
+    captured = {}
+
+    def fake_finalize_allure_reporting(**kwargs):
+        captured.update(kwargs)
+        index_path = Path(kwargs["output_dir"]) / "index.html"
+        return _result("core", core_path=index_path)
+
+    monkeypatch.setattr(
+        reporting,
+        "finalize_allure_reporting",
+        fake_finalize_allure_reporting,
+    )
+
+    result = reporting.finalize_web_report(project_root=tmp_path, results_dir=results_dir)
+
+    assert result.ok
+    assert captured["metadata"]["artifacts"]["healing_audit"] == "reports/healing/events.jsonl"
+    assert captured["enrichers"]
+
+
 def test_finalize_web_report_keeps_allure_optional_for_both(tmp_path, monkeypatch):
     _write_settings(tmp_path)
     results_dir = tmp_path / "reports" / "allure-results"
