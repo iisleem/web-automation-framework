@@ -107,6 +107,9 @@ For the shared family guidance behind this layout, see
 For a first-run guide with screenshots from the sample reports, see
 [Web Framework Walkthrough](docs/WALKTHROUGH.md).
 
+For focused runnable recipes that demonstrate Page Object and flow usage, see
+[Runnable Web Examples](docs/EXAMPLES.md).
+
 ## Quick Start
 
 ```bash
@@ -693,6 +696,14 @@ Passed-test videos are deleted automatically so `videos/` only keeps useful fail
 | Complete checkout flow | `tests/e2e/test_checkout.py::test_complete_checkout_flow` |
 | Negative checkout validation | `tests/e2e/test_checkout.py::test_checkout_requires_first_name` |
 | Failure reporting demo | `tests/regression/test_reporting_demo.py::test_intentional_failure_generates_artifacts` |
+
+For smaller runnable recipes, use the `examples` marker:
+
+```bash
+python framework.py run --browser chromium -m examples --report-kind core --no-open-report
+```
+
+See [Runnable Web Examples](docs/EXAMPLES.md) for the recipe list and report outputs.
 
 ## Feature Examples
 
