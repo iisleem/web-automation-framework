@@ -574,18 +574,21 @@ reports/allure-results/
 At the end of the test session, the framework automatically generates:
 
 ```text
-reports/automation-report/index.html
-reports/automation-report/report-data.json
+reports/automation-report/index.html                 # Portfolio dashboard across retained runs
+reports/automation-report/reports.html               # Report gallery and run picker
+reports/automation-report/portfolio-data.json        # Portfolio index data
+reports/automation-report/runs/<timestamp>-<run-id>/ # Current run details and report-data.json
 ```
 
-This is the default automation-core product report. `index.html` is opened locally after a run, and
-`report-data.json` stores the report data used by the dashboard.
+This is the default automation-core product report. `index.html` is opened locally after a run as
+the retained-run portfolio dashboard. Each execution keeps its detailed report, readable timestamp,
+artifacts, and `report-data.json` under a timestamped `runs/` folder.
 
 Report generation flow:
 
 1. Pytest writes raw Allure result files to `reports/allure-results/`.
 2. The web adapter calls `automation_core.reporting.finalize_allure_reporting(...)`.
-3. By default, `report_kind=core` generates `reports/automation-report/index.html` and `reports/automation-report/report-data.json`.
+3. By default, `report_kind=core` generates the portfolio dashboard plus a timestamped run report under `reports/automation-report/runs/`.
 4. If the run is local, the framework opens the core report in the default browser.
 5. If the run is in CI/server mode or browser opening fails, the framework logs a note and does not fail a successful test run.
 
@@ -593,7 +596,7 @@ Supported report kinds:
 
 | Kind | Output | Purpose |
 | --- | --- | --- |
-| `core` | `reports/automation-report/index.html` plus `report-data.json` | Default product report and recommended local/CI artifact |
+| `core` | `reports/automation-report/index.html`, `reports.html`, and `runs/<timestamp>-<run-id>/index.html` | Default retained-run portfolio and recommended local/CI artifact |
 | `allure` | `reports/allure-report/index.html` | Official Allure HTML report only |
 | `both` | Core report plus official Allure report | Recommended when a team wants the product dashboard and Allure drill-downs |
 | `summary` | `reports/summary-report/index.html` | Lightweight summary report |
