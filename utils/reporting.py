@@ -6,6 +6,7 @@ from typing import Any, Literal
 from automation_core.reporting import finalize_allure_reporting
 
 from utils.config_reader import ConfigReader
+from utils.runtime_healing import DEFAULT_AUDIT_PATH, healing_report_enricher
 
 
 ReportKind = Literal["core", "summary", "allure", "both"]
@@ -113,6 +114,10 @@ def build_web_report_metadata(
                 project_root,
                 artifacts.get("traces_dir", "traces"),
             ),
+            "healing_audit": _as_relative_string(
+                project_root,
+                config.get("runtime_healing", {}).get("audit_path", DEFAULT_AUDIT_PATH),
+            ),
         },
     }
     if extra:
@@ -145,6 +150,7 @@ def finalize_web_report(
         allure_output_dir=allure_output_dir,
         summary_output_dir=summary_output_dir,
     )
+    report_metadata = _make_json_safe(metadata) if metadata else build_web_report_metadata(project_root)
     result = finalize_allure_reporting(
         results_dir=results_dir,
         output_dir=primary_output_dir(paths, kind),
@@ -156,12 +162,22 @@ def finalize_web_report(
         missing_ok=missing_ok,
         allure_output_dir=paths["allure"],
         summary_output_dir=paths["summary"],
-        metadata=_make_json_safe(metadata) if metadata else build_web_report_metadata(project_root),
+        metadata=report_metadata,
+        enrichers=[healing_report_enricher(_healing_audit_path(project_root, report_metadata))],
         install_allure_cli=True,
         logger=logger,
     )
     _log_reporting_result(result, logger)
     return result
+
+
+def _healing_audit_path(project_root: Path, metadata: dict[str, Any]) -> Path:
+    audit_path = metadata.get("artifacts", {}).get("healing_audit")
+    if not audit_path:
+        audit_path = (
+            ConfigReader(project_root).read_settings().get("runtime_healing", {}).get("audit_path", DEFAULT_AUDIT_PATH)
+        )
+    return _resolve_project_path(project_root, audit_path)
 
 
 def _log_reporting_result(result, logger) -> None:

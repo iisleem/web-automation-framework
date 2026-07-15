@@ -22,7 +22,7 @@ The included demo application is [SauceDemo](https://www.saucedemo.com/).
 - Optional official Allure HTML report generation with local CLI install when requested
 - Report kind selection: `core`, `allure`, `both`, or `summary`
 - Automatic local report opening after test runs, skipped safely in CI/server environments
-- Optional self-healing locators with engineer-defined fallback selectors
+- Optional self-healing locators and disabled-by-default runtime auto-healing audit/apply modes
 - Screenshots, videos, and Playwright traces on failed tests
 - Reusable helper library for OTP email, polling, text extraction, and common automation utilities
 - JSON test data files for users and checkout data
@@ -62,6 +62,7 @@ web-automation-framework/
 │   ├── logger.py                  # Framework logger
 │   ├── report_generator.py        # Compatibility wrapper over automation-core report helpers
 │   ├── reporting.py               # Web adapter for automation-core reporting
+│   ├── runtime_healing.py         # Web adapter for runtime locator healing
 │   ├── self_healing.py            # Self-healing locator data model
 │   └── screenshot_helper.py       # Screenshot helper
 ├── scripts/
@@ -885,11 +886,20 @@ from utils.helpers.text import extract_otp
 otp = extract_otp("Your verification code is 482913")
 ```
 
-## Self-Healing Locators
+## Self-Healing And Runtime Auto-Healing
 
-The framework supports conservative self-healing locators. This means a Page Object can define a primary selector and one or more fallback selectors. If the primary selector is not attached to the DOM, the framework tries the fallback selectors in order.
+The framework supports two conservative locator recovery layers.
 
-Self-healing is configured in:
+Engineer-defined self-healing means a Page Object can define a primary selector and one or more
+fallback selectors. If the primary selector is not attached to the DOM, the framework tries the
+fallback selectors in order.
+
+Runtime auto-healing is separate and disabled by default. When enabled, it runs only after the
+original Playwright action fails. `suggest` mode records ranked candidates without applying them.
+`apply` mode uses a candidate only when automation-core returns `APPLIED` and the web adapter safety
+checks pass.
+
+Both layers are configured in:
 
 ```text
 config/settings.yaml
@@ -899,6 +909,21 @@ config/settings.yaml
 self_healing:
   enabled: true
   timeout_ms: 1500
+
+runtime_healing:
+  mode: disabled
+  min_score: 0.78
+  ambiguity_delta: 0.05
+  max_candidates: 10
+  allowed_actions:
+    - click
+    - fill
+    - select
+    - text
+    - expect_visible
+  allow_patterns: []
+  deny_patterns: []
+  audit_path: reports/healing/events.jsonl
 ```
 
 Example Page Object usage:
@@ -912,20 +937,32 @@ self.login_button = self.locator_with_fallbacks(
 )
 ```
 
-When a fallback is used, the framework:
+When an engineer-defined fallback is used, the framework:
 
 - Logs a warning
 - Adds an Allure step
 - Attaches the primary and fallback selector details to the Allure result
 
-Self-healing is intentionally not magic. It only uses fallback selectors written by the automation engineer. This prevents the framework from silently hiding real UI regressions.
+When runtime auto-healing is attempted, the framework:
 
-Disable self-healing:
+- Logs the attempt and decision
+- Writes a JSONL audit event under `reports/healing/`
+- Attaches the event to Allure
+- Enriches the core product report with healing metadata
+
+Runtime candidate discovery is web-owned and Playwright-based. It looks at stable element signals
+such as `data-test`, `data-testid`, `id`, `name`, `aria-label`, role, and nearby text. Full DOM XPath
+is not used as a primary signal.
+
+Disable all locator recovery beyond the original locator:
 
 ```yaml
 self_healing:
   enabled: false
   timeout_ms: 1500
+
+runtime_healing:
+  mode: disabled
 ```
 
 ## Working With Test Data
