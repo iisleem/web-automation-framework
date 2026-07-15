@@ -13,6 +13,8 @@ path for documentation images because it can fail on macOS depending on GUI and 
 This guidance does not change `utils/screenshot_helper.py` or visual helpers. They use Playwright
 screenshots, which remain the supported runtime path.
 
+For a compact list of the current documentation images, see [Screenshot Index](SCREENSHOTS.md).
+
 ## 1. Set Up The Project
 
 ```bash

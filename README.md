@@ -72,6 +72,7 @@ web-automation-framework/
 │   ├── FRAMEWORK_HELPERS.md       # Helper usage guide
 │   ├── FEATURE_PARITY.md          # Web baseline and cross-framework parity notes
 │   ├── WALKTHROUGH.md             # First-run walkthrough with local report screenshots
+│   ├── SCREENSHOTS.md             # Documentation screenshot index
 │   ├── assets/walkthrough/        # Walkthrough screenshots captured from sample runs
 │   └── helpers_catalog.html       # Searchable helper catalog
 ├── templates/
@@ -106,6 +107,9 @@ For the shared family guidance behind this layout, see
 
 For a first-run guide with screenshots from the sample reports, see
 [Web Framework Walkthrough](docs/WALKTHROUGH.md).
+
+For a quick index of report and artifact screenshots, see
+[Screenshot Index](docs/SCREENSHOTS.md).
 
 For focused runnable recipes that demonstrate Page Object and flow usage, see
 [Runnable Web Examples](docs/EXAMPLES.md).
