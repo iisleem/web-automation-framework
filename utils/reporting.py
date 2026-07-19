@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any, Literal
 
@@ -163,12 +164,79 @@ def finalize_web_report(
         allure_output_dir=paths["allure"],
         summary_output_dir=paths["summary"],
         metadata=report_metadata,
+        test_metadata=build_web_test_metadata(results_dir, report_metadata),
         enrichers=[healing_report_enricher(_healing_audit_path(project_root, report_metadata))],
         install_allure_cli=True,
         logger=logger,
     )
     _log_reporting_result(result, logger)
     return result
+
+
+def build_web_test_metadata(results_dir: Path, metadata: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    base_metadata = _test_metadata_from_run_metadata(metadata)
+    if not base_metadata:
+        return {}
+
+    test_metadata: dict[str, dict[str, Any]] = {}
+    for result_path in sorted(Path(results_dir).glob("*-result.json")):
+        try:
+            result = json.loads(result_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        entry = {
+            **base_metadata,
+            **_test_metadata_from_allure_result(result),
+        }
+        for key in (result.get("historyId"), result.get("fullName"), result.get("name")):
+            if key:
+                test_metadata[str(key)] = entry
+    return test_metadata
+
+
+def _test_metadata_from_run_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
+    artifacts = metadata.get("artifacts", {})
+    capabilities = {
+        "automation_engine": metadata.get("automation_engine"),
+        "test_runner": metadata.get("test_runner"),
+        "viewport": metadata.get("viewport"),
+    }
+    return _make_json_safe(
+        {
+            "domain": metadata.get("domain", "web"),
+            "environment": metadata.get("environment"),
+            "profile": metadata.get("profile"),
+            "browser": metadata.get("browser"),
+            "capabilities": {key: value for key, value in capabilities.items() if value not in (None, "")},
+            "artifact_roots": artifacts,
+            "base_url": metadata.get("base_url"),
+        }
+    )
+
+
+def _test_metadata_from_allure_result(result: dict[str, Any]) -> dict[str, Any]:
+    parameters = _allure_parameters(result)
+    browser = parameters.get("browser") or parameters.get("browser_name")
+    if browser:
+        return {"browser": _strip_parameter_quotes(browser), "profile": _strip_parameter_quotes(browser)}
+    return {}
+
+
+def _allure_parameters(result: dict[str, Any]) -> dict[str, str]:
+    parameters: dict[str, str] = {}
+    for parameter in result.get("parameters", []):
+        name = parameter.get("name")
+        value = parameter.get("value")
+        if name and value is not None:
+            parameters[str(name)] = str(value)
+    return parameters
+
+
+def _strip_parameter_quotes(value: str) -> str:
+    stripped = value.strip()
+    if len(stripped) >= 2 and stripped[0] == stripped[-1] and stripped[0] in {"'", '"'}:
+        return stripped[1:-1]
+    return stripped
 
 
 def _healing_audit_path(project_root: Path, metadata: dict[str, Any]) -> Path:

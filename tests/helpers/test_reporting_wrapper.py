@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 from types import SimpleNamespace
 
 import pytest
@@ -63,6 +64,57 @@ def test_finalize_web_report_passes_core_report_enrichers(tmp_path, monkeypatch)
     assert result.ok
     assert captured["metadata"]["artifacts"]["healing_audit"] == "reports/healing/events.jsonl"
     assert captured["enrichers"]
+
+
+def test_finalize_web_report_passes_web_test_metadata(tmp_path, monkeypatch):
+    _write_settings(tmp_path)
+    results_dir = tmp_path / "reports" / "allure-results"
+    results_dir.mkdir(parents=True)
+    _write_allure_result(
+        results_dir / "example-result.json",
+        {
+            "historyId": "history-1",
+            "name": "test_example[chromium]",
+            "fullName": "tests.examples.test_example#test_example",
+            "parameters": [{"name": "browser_name", "value": "'chromium'"}],
+        },
+    )
+    captured = {}
+
+    def fake_finalize_allure_reporting(**kwargs):
+        captured.update(kwargs)
+        index_path = Path(kwargs["output_dir"]) / "index.html"
+        return _result("core", core_path=index_path)
+
+    monkeypatch.setattr(
+        reporting,
+        "finalize_allure_reporting",
+        fake_finalize_allure_reporting,
+    )
+
+    result = reporting.finalize_web_report(
+        project_root=tmp_path,
+        results_dir=results_dir,
+        metadata={
+            "domain": "web",
+            "environment": "qa",
+            "automation_engine": "playwright",
+            "test_runner": "pytest",
+            "viewport": {"width": 1440, "height": 900},
+            "artifacts": {"screenshots_dir": "screenshots"},
+        },
+    )
+
+    test_metadata = captured["test_metadata"]
+    assert result.ok
+    assert test_metadata["history-1"]["domain"] == "web"
+    assert test_metadata["history-1"]["environment"] == "qa"
+    assert test_metadata["history-1"]["browser"] == "chromium"
+    assert test_metadata["history-1"]["profile"] == "chromium"
+    assert test_metadata["history-1"]["capabilities"]["automation_engine"] == "playwright"
+    assert (
+        test_metadata["tests.examples.test_example#test_example"]["artifact_roots"]["screenshots_dir"] == "screenshots"
+    )
 
 
 def test_finalize_web_report_keeps_allure_optional_for_both(tmp_path, monkeypatch):
@@ -134,6 +186,10 @@ reporting:
 """.strip(),
         encoding="utf-8",
     )
+
+
+def _write_allure_result(path: Path, payload: dict) -> None:
+    path.write_text(json.dumps(payload), encoding="utf-8")
 
 
 def _status(path=None, generated=True, requested=True):
