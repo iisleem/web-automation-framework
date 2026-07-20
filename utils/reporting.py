@@ -89,6 +89,7 @@ def build_web_report_metadata(
     browser_settings = config.get("browser", {})
     artifacts = config.get("artifacts", {})
     metadata: dict[str, Any] = {
+        "platform_type": "web",
         "domain": "web",
         "framework": PROJECT_NAME,
         "automation_engine": "playwright",
@@ -138,9 +139,15 @@ def finalize_web_report(
     open_target: str = "auto",
     missing_ok: bool = False,
     metadata: dict[str, Any] | None = None,
+    history_dir: Path | str | None = None,
     logger=None,
 ) -> Any:
     kind = configured_report_kind(project_root, report_kind)
+    history_path = (
+        _resolve_project_path(project_root, history_dir)
+        if history_dir is not None
+        else project_root / "reports" / "history"
+    )
     if kind == "allure" and output_dir is not None and allure_output_dir is None:
         allure_output_dir = output_dir
     if kind == "summary" and output_dir is not None and summary_output_dir is None:
@@ -166,6 +173,7 @@ def finalize_web_report(
         metadata=report_metadata,
         test_metadata=build_web_test_metadata(results_dir, report_metadata),
         enrichers=[healing_report_enricher(_healing_audit_path(project_root, report_metadata))],
+        history_dir=history_path,
         install_allure_cli=True,
         logger=logger,
     )
@@ -203,6 +211,7 @@ def _test_metadata_from_run_metadata(metadata: dict[str, Any]) -> dict[str, Any]
     }
     return _make_json_safe(
         {
+            "platform_type": metadata.get("platform_type", "web"),
             "domain": metadata.get("domain", "web"),
             "environment": metadata.get("environment"),
             "profile": metadata.get("profile"),
