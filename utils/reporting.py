@@ -89,6 +89,7 @@ def build_web_report_metadata(
     browser_settings = config.get("browser", {})
     artifacts = config.get("artifacts", {})
     metadata: dict[str, Any] = {
+        "platform_type": "web",
         "domain": "web",
         "framework": PROJECT_NAME,
         "automation_engine": "playwright",
@@ -203,6 +204,7 @@ def _test_metadata_from_run_metadata(metadata: dict[str, Any]) -> dict[str, Any]
     }
     return _make_json_safe(
         {
+            "platform_type": metadata.get("platform_type", "web"),
             "domain": metadata.get("domain", "web"),
             "environment": metadata.get("environment"),
             "profile": metadata.get("profile"),
